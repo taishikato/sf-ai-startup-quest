@@ -68,9 +68,9 @@ export function SfAiMap() {
   const mapCompanies = filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany]
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="mx-auto max-w-[1440px] px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-        <div className="grid gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
+    <main className="h-screen overflow-hidden bg-background">
+      <section className="mx-auto h-full max-w-[1440px] px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
           <DiscoveryPanel
             companies={filteredCompanies}
             selectedCompany={selectedCompany}
@@ -82,7 +82,7 @@ export function SfAiMap() {
             onCategoryChange={setCategory}
             onSelectCompany={setSelectedSlug}
           />
-          <div className="flex flex-col gap-4">
+          <div className="flex min-h-0 flex-col gap-4 overflow-hidden">
             <MapShell
               companies={mapCompanies}
               selectedCompany={selectedCompany}

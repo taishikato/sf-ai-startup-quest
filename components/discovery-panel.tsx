@@ -36,7 +36,7 @@ export function DiscoveryPanel({
   onSelectCompany,
 }: DiscoveryPanelProps) {
   return (
-    <aside className="flex min-h-[40rem] flex-col gap-4 border border-border bg-card p-5">
+    <aside className="flex min-h-0 h-full flex-col gap-4 overflow-y-auto border border-border bg-card p-5">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <span className="border border-border bg-secondary px-3 py-1 text-[11px] font-medium uppercase text-secondary-foreground">
@@ -110,13 +110,13 @@ export function DiscoveryPanel({
         <CompanyCard company={selectedCompany} active />
       </section>
 
-      <section className="min-h-0 flex-1 space-y-3">
+      <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-foreground">Visible on the map</h2>
           <span className="text-xs text-muted-foreground">Select a card or pin</span>
         </div>
         {companies.length > 0 ? (
-          <div className="grid gap-3 overflow-y-auto pr-1">
+          <div className="grid gap-3 pr-1">
             {companies.map((company) => (
               <CompanyCard
                 key={company.slug}
