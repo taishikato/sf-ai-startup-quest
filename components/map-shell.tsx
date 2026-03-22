@@ -172,9 +172,9 @@ export function MapShell({ companies, selectedCompany, onSelectCompany }: MapShe
   }, [selectedCompany])
 
   return (
-    <div className="relative h-[34rem] overflow-hidden border border-border bg-white lg:h-[calc(100vh-2rem)] lg:min-h-[40rem] lg:max-h-[48rem]">
+    <div className="relative h-full overflow-hidden border border-border bg-white lg:min-h-160">
       <div ref={containerRef} className="h-full w-full" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background/95 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-linear-to-b from-background/95 to-transparent" />
       <div className="pointer-events-none absolute top-4 left-4 max-w-sm border border-border bg-background px-4 py-3">
         <div className="text-[11px] font-semibold uppercase text-muted-foreground">
           SF AI startup map

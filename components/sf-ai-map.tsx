@@ -60,7 +60,7 @@ export function SfAiMap() {
   return (
     <main className="h-screen overflow-hidden bg-background">
       <section className="mx-auto h-full w-full">
-        <div className="grid h-full min-h-0 gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
+        <div className="grid h-full min-h-0 lg:grid-cols-[400px_minmax(0,1fr)]">
           <DiscoveryPanel
             companies={filteredCompanies}
             selectedCompany={selectedCompany}
