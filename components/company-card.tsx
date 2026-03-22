@@ -27,6 +27,55 @@ export function CompanyCard({
 }: CompanyCardProps) {
   const monogram = getCompanyMonogram(company)
 
+  const compactBody = (
+    <article
+      className={cn(
+        "border p-3 transition-colors",
+        active
+          ? "border-foreground bg-card"
+          : "border-border bg-background hover:border-muted-foreground/40"
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <CompanyLogo company={company} monogram={monogram} compact />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase text-muted-foreground">
+                <span>{company.category}</span>
+                <span>{tierLabel[company.featuredTier]}</span>
+              </div>
+              <h3 className="mt-1 text-base font-semibold tracking-[-0.02em] text-foreground">
+                {company.name}
+              </h3>
+            </div>
+            <a
+              href={company.website}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Visit ${company.name}`}
+              className="inline-flex size-8 shrink-0 items-center justify-center border border-border bg-background text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowUpRight className="size-3.5" />
+            </a>
+          </div>
+
+          <p className="mt-2 line-clamp-2 text-sm leading-5 text-muted-foreground">
+            {company.shortDescription}
+          </p>
+
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="size-3.5" />
+              {company.neighborhood}
+            </span>
+            <span>Founded {company.founded}</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  )
+
   const body = (
     <article
       className={cn(
@@ -88,8 +137,10 @@ export function CompanyCard({
     </article>
   )
 
+  const cardBody = compact ? compactBody : body
+
   if (!onSelect || compact === false) {
-    return body
+    return cardBody
   }
 
   return (
@@ -105,7 +156,7 @@ export function CompanyCard({
       }}
       className="w-full text-left outline-none"
     >
-      {body}
+      {cardBody}
     </div>
   )
 }
@@ -113,21 +164,30 @@ export function CompanyCard({
 function CompanyLogo({
   company,
   monogram,
+  compact = false,
 }: {
   company: Company
   monogram: string
+  compact?: boolean
 }) {
   const [showFallback, setShowFallback] = useState(false)
 
   return (
-    <div className="flex size-10 shrink-0 items-center justify-center border border-border bg-white">
+    <div
+      className={cn(
+        "flex shrink-0 items-center justify-center border border-border bg-white",
+        compact ? "size-9" : "size-10"
+      )}
+    >
       {showFallback ? (
-        <span className="text-sm font-semibold text-foreground">{monogram}</span>
+        <span className={cn("font-semibold text-foreground", compact ? "text-xs" : "text-sm")}>
+          {monogram}
+        </span>
       ) : (
         <img
           src={getCompanyLogoUrl(company)}
           alt={`${company.name} logo`}
-          className="size-6 object-contain"
+          className={cn("object-contain", compact ? "size-5" : "size-6")}
           loading="lazy"
           onError={() => setShowFallback(true)}
         />

@@ -14,9 +14,11 @@ type MapShellProps = {
 const SF_CENTER: [number, number] = [-122.4167, 37.7793]
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
 
-function styleMarker(element: HTMLButtonElement, active: boolean) {
-  element.style.width = active ? "30px" : "24px"
-  element.style.height = active ? "30px" : "24px"
+function styleMarker(element: HTMLButtonElement, active: boolean, dense: boolean) {
+  const size = dense ? (active ? 26 : 20) : active ? 30 : 24
+
+  element.style.width = `${size}px`
+  element.style.height = `${size}px`
   element.style.borderRadius = "0"
   element.style.border = active ? "2px solid #111111" : "2px solid #d4d4d8"
   element.style.background = active ? "#111111" : "#ffffff"
@@ -28,23 +30,29 @@ function styleMarker(element: HTMLButtonElement, active: boolean) {
     : "0 4px 10px rgba(0, 0, 0, 0.08)"
 }
 
-function setMarkerContent(element: HTMLButtonElement, company: Company, active: boolean) {
+function setMarkerContent(
+  element: HTMLButtonElement,
+  company: Company,
+  active: boolean,
+  dense: boolean
+) {
   const monogram = getCompanyMonogram(company)
   const image = document.createElement("img")
+  const iconSize = dense ? (active ? 14 : 11) : active ? 18 : 14
 
   image.src = getCompanyLogoUrl(company)
   image.alt = `${company.name} logo`
-  image.width = active ? 18 : 14
-  image.height = active ? 18 : 14
-  image.style.width = active ? "18px" : "14px"
-  image.style.height = active ? "18px" : "14px"
+  image.width = iconSize
+  image.height = iconSize
+  image.style.width = `${iconSize}px`
+  image.style.height = `${iconSize}px`
   image.style.objectFit = "contain"
 
   image.addEventListener("error", () => {
     element.replaceChildren()
     const fallback = document.createElement("span")
     fallback.textContent = monogram
-    fallback.style.fontSize = active ? "11px" : "10px"
+    fallback.style.fontSize = dense ? (active ? "10px" : "9px") : active ? "11px" : "10px"
     fallback.style.fontWeight = "700"
     fallback.style.lineHeight = "1"
     fallback.style.color = active ? "#ffffff" : "#111111"
@@ -59,6 +67,7 @@ export function MapShell({ companies, selectedCompany, onSelectCompany }: MapShe
   const mapRef = useRef<MapLibreMap | null>(null)
   const markersRef = useRef<Map<string, Marker>>(new Map())
   const hasInteractedRef = useRef(false)
+  const dense = companies.length >= 60
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -116,8 +125,8 @@ export function MapShell({ companies, selectedCompany, onSelectCompany }: MapShe
       element.style.padding = "0"
       element.style.background = company.slug === selectedCompany.slug ? "#111111" : "#ffffff"
       element.style.outline = "none"
-      styleMarker(element, company.slug === selectedCompany.slug)
-      setMarkerContent(element, company, company.slug === selectedCompany.slug)
+      styleMarker(element, company.slug === selectedCompany.slug, dense)
+      setMarkerContent(element, company, company.slug === selectedCompany.slug, dense)
       element.addEventListener("click", () => onSelectCompany(company.slug))
 
       const marker = new maplibregl.Marker({ element, anchor: "center" })
@@ -126,7 +135,7 @@ export function MapShell({ companies, selectedCompany, onSelectCompany }: MapShe
 
       markersRef.current.set(company.slug, marker)
     })
-  }, [companies, onSelectCompany, selectedCompany.slug])
+  }, [companies, dense, onSelectCompany, selectedCompany.slug])
 
   useEffect(() => {
     markersRef.current.forEach((marker, slug) => {
@@ -136,11 +145,11 @@ export function MapShell({ companies, selectedCompany, onSelectCompany }: MapShe
 
       element.style.zIndex = active ? "10" : "1"
       if (company) {
-        styleMarker(element, active)
-        setMarkerContent(element, company, active)
+        styleMarker(element, active, dense)
+        setMarkerContent(element, company, active, dense)
       }
     })
-  }, [companies, selectedCompany])
+  }, [companies, dense, selectedCompany])
 
   useEffect(() => {
     const map = mapRef.current
