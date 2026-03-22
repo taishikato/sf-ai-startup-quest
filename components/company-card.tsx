@@ -27,20 +27,20 @@ export function CompanyCard({
   const body = (
     <article
       className={cn(
-        "rounded-[28px] border p-4 transition-all",
+        "border p-4 transition-colors",
         active
-          ? "border-[var(--accent-strong)] bg-[var(--card)] shadow-[0_24px_50px_-28px_rgba(34,46,62,0.45)]"
-          : "border-[color:var(--line)] bg-white/80 hover:border-[var(--accent-strong)] hover:bg-[var(--card)]"
+          ? "border-foreground bg-card"
+          : "border-border bg-background hover:border-muted-foreground/40"
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-[var(--muted-ink)] uppercase">
-            <span className="rounded-full bg-[var(--card-soft)] px-2.5 py-1 text-[10px] tracking-[0.22em]">
+          <div className="flex items-center gap-2 text-xs font-medium uppercase text-muted-foreground">
+            <span className="bg-secondary px-2.5 py-1 text-[10px] tracking-[0.16em] text-secondary-foreground">
               {company.category}
             </span>
             {company.featuredTier === "hot" ? (
-              <span className="inline-flex items-center gap-1 text-[var(--accent-strong)]">
+              <span className="inline-flex items-center gap-1 text-orange-600">
                 <Flame className="size-3" />
                 {tierLabel[company.featuredTier]}
               </span>
@@ -48,7 +48,7 @@ export function CompanyCard({
               <span>{tierLabel[company.featuredTier]}</span>
             )}
           </div>
-          <h3 className="mt-3 text-xl font-semibold tracking-[-0.03em] text-[var(--ink)]">
+          <h3 className="mt-3 text-xl font-semibold tracking-[-0.03em] text-foreground">
             {company.name}
           </h3>
         </div>
@@ -57,22 +57,22 @@ export function CompanyCard({
           target="_blank"
           rel="noreferrer"
           aria-label={`Visit ${company.name}`}
-          className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-[color:var(--line)] bg-white/80 text-[var(--ink)] transition-colors hover:border-[var(--accent-strong)] hover:text-[var(--accent-strong)]"
+          className="inline-flex size-10 shrink-0 items-center justify-center border border-border bg-background text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowUpRight className="size-4" />
         </a>
       </div>
 
-      <p className="mt-4 text-sm leading-6 text-[var(--muted-ink)]">{company.shortDescription}</p>
+      <p className="mt-4 text-sm leading-6 text-muted-foreground">{company.shortDescription}</p>
 
-      <div className="mt-4 rounded-[22px] bg-[var(--card-soft)] px-4 py-3">
-        <div className="text-[11px] font-semibold tracking-[0.18em] text-[var(--muted-ink)] uppercase">
+      <div className="mt-4 bg-muted px-4 py-3">
+        <div className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
           Why it matters
         </div>
-        <p className="mt-2 text-sm leading-6 text-[var(--ink)]">{company.whyItMatters}</p>
+        <p className="mt-2 text-sm leading-6 text-foreground">{company.whyItMatters}</p>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[var(--muted-ink)]">
+      <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <MapPin className="size-3.5" />
           {company.neighborhood}

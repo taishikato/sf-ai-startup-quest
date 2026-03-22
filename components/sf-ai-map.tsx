@@ -68,9 +68,9 @@ export function SfAiMap() {
   const mapCompanies = filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany]
 
   return (
-    <main className="min-h-screen bg-[var(--background)]">
-      <section className="mx-auto max-w-[1560px] px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-        <div className="grid gap-5 lg:grid-cols-[430px_minmax(0,1fr)]">
+    <main className="min-h-screen bg-background">
+      <section className="mx-auto max-w-[1440px] px-4 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <div className="grid gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
           <DiscoveryPanel
             companies={filteredCompanies}
             selectedCompany={selectedCompany}
@@ -82,7 +82,7 @@ export function SfAiMap() {
             onCategoryChange={setCategory}
             onSelectCompany={setSelectedSlug}
           />
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             <MapShell
               companies={mapCompanies}
               selectedCompany={selectedCompany}
@@ -90,10 +90,8 @@ export function SfAiMap() {
             />
             <div className="grid gap-4 lg:hidden">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold tracking-[0.2em] text-[var(--muted-ink)] uppercase">
-                  Selected stop
-                </h2>
-                <span className="text-xs text-[var(--muted-ink)]">Mobile-friendly detail view</span>
+                <h2 className="text-sm font-semibold text-foreground">Selected stop</h2>
+                <span className="text-xs text-muted-foreground">Mobile detail view</span>
               </div>
               <CompanyCard company={selectedCompany} active />
             </div>
