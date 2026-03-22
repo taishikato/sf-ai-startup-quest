@@ -32,16 +32,11 @@ export function DiscoveryPanel({
   return (
     <aside className="flex min-h-0 h-full flex-col gap-4 overflow-y-auto border border-border bg-card p-5">
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="border border-border bg-secondary px-3 py-1 text-[11px] font-medium uppercase text-secondary-foreground">
-            Curated map
-          </span>
-          <span className="text-xs text-muted-foreground">{companies.length} companies</span>
-        </div>
         <div className="space-y-3">
           <h1 className="max-w-xs text-4xl font-semibold leading-tight tracking-[-0.04em] text-foreground">
             SF AI startups, mapped.
           </h1>
+          <div className="text-sm text-muted-foreground">{companies.length} companies</div>
           <p className="max-w-md text-sm leading-6 text-muted-foreground">
             A clean, curated view of the companies shaping the current San Francisco AI
             scene. Browse the map, filter the categories, and open the names that matter.
@@ -91,16 +86,6 @@ export function DiscoveryPanel({
           </div>
         </div>
       </div>
-
-      <section className="space-y-3">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground">Selected</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            The selected company stays pinned while you filter the list.
-          </p>
-        </div>
-        <CompanyCard company={selectedCompany} active />
-      </section>
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
