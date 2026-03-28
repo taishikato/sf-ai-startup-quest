@@ -62,12 +62,10 @@ type Company = {
   neighborhood: string
   coordinates: [number, number]   // [lng, lat]
   founded: number
-  featuredTier: FeaturedTier
   logoUrl?: string
 }
 
 type CompanyCategory = "Core Labs" | "Consumer AI" | "Devtools" | "Infra" | "Agents" | "Vertical AI"
-type FeaturedTier = "core" | "hot" | "scene"
 ```
 
 ## Data Flow

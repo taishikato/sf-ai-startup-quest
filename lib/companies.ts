@@ -27,10 +27,6 @@ export function categoryPillForeground(category: CompanyCategory): "#ffffff" | "
   return category === "Devtools" ? "#1a1a2e" : "#ffffff"
 }
 
-export const FEATURED_TIERS = ["core", "hot", "scene"] as const
-
-export type FeaturedTier = (typeof FEATURED_TIERS)[number]
-
 export type Company = {
   slug: string
   name: string
@@ -41,7 +37,6 @@ export type Company = {
   locationLabel: string
   coordinates: [number, number]
   founded: number
-  featuredTier: FeaturedTier
   logoUrl?: string
   /** When true, the card is omitted from the sidebar until the user searches. */
   hideFromSidebar?: boolean
@@ -98,7 +93,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "1455 3rd St, San Francisco",
     coordinates: [-122.3887896, 37.7700459],
     founded: 2015,
-    featuredTier: "core",
     sourceUrl:
       "https://cdn.openai.com/pdf/8e938d69-0b67-4994-b9ff-683733ed587e/openai-letter-minister-solomon.pdf",
     sourceLabel: "OpenAI letterhead",
@@ -113,7 +107,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "548 Market St, San Francisco",
     coordinates: [-122.4001044, 37.7900832],
     founded: 2021,
-    featuredTier: "core",
     sourceUrl: "https://craft.co/anthropic/locations",
     sourceLabel: "Craft locations page",
   },
@@ -127,7 +120,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "115 Sansome St, San Francisco",
     coordinates: [-122.4010654, 37.7914533],
     founded: 2022,
-    featuredTier: "core",
     sourceUrl: "https://craft.co/perplexity-ai/locations",
     sourceLabel: "Craft locations page",
   },
@@ -141,7 +133,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "650 Townsend St, San Francisco",
     coordinates: [-122.4036566, 37.7709567],
     founded: 2016,
-    featuredTier: "core",
     sourceUrl: "https://craft.co/scale-ai/locations",
     sourceLabel: "Craft locations page",
   },
@@ -155,7 +146,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "575 Sutter St, San Francisco",
     coordinates: [-122.4097317, 37.7888158],
     founded: 2019,
-    featuredTier: "core",
     sourceUrl: "https://craft.co/baseten/locations",
     sourceLabel: "Craft locations page",
   },
@@ -169,7 +159,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "575 Market St, San Francisco",
     coordinates: [-122.4003752, 37.7895414],
     founded: 2022,
-    featuredTier: "hot",
     sourceUrl: "https://craft.co/harvey-ai/locations",
     sourceLabel: "Craft locations page",
   },
@@ -185,7 +174,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "3180 18th St, San Francisco",
     coordinates: [-122.4146, 37.7622],
     founded: 2023,
-    featuredTier: "core",
     sourceUrl:
       "https://traded.co/deals/california/office/lease/3180-18th-street/",
     sourceLabel: "Traded.co lease record",
@@ -202,7 +190,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "235 Second St, San Francisco",
     coordinates: [-122.3972, 37.786],
     founded: 2023,
-    featuredTier: "core",
     sourceUrl:
       "https://traded.co/deals/california/office/lease/235-second-street/",
     sourceLabel: "Traded.co lease record",
@@ -219,7 +206,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "2300 Harrison St, San Francisco",
     coordinates: [-122.4127, 37.7606],
     founded: 2025,
-    featuredTier: "core",
     sourceUrl:
       "https://traded.co/deals/california/office/lease/2300-harrison-street/",
     sourceLabel: "Traded.co lease record",
@@ -236,7 +222,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "251 Rhode Island St, San Francisco",
     coordinates: [-122.4027, 37.7667],
     founded: 2022,
-    featuredTier: "hot",
     sourceUrl: "https://www.together.ai/terms-of-service",
     sourceLabel: "Together AI Terms of Service",
   },
@@ -252,7 +237,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "33 New Montgomery St, San Francisco",
     coordinates: [-122.4013, 37.7886],
     founded: 2022,
-    featuredTier: "hot",
     sourceUrl: "https://www.cbinsights.com/company/anysphere",
     sourceLabel: "CB Insights company profile",
   },
@@ -268,7 +252,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "1875 Mission St, San Francisco",
     coordinates: [-122.4198, 37.7671],
     founded: 2023,
-    featuredTier: "hot",
     sourceUrl:
       "https://www.bizprofile.net/ca/san-francisco/cognition-ai-inc",
     sourceLabel: "California business filing via BizProfile",
@@ -285,7 +268,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "396 Treat Ave, San Francisco",
     coordinates: [-122.4136, 37.7639],
     founded: 2024,
-    featuredTier: "hot",
     sourceUrl:
       "https://www.bizprofile.net/ca/san-francisco/physical-intelligence-pi-inc",
     sourceLabel: "California business filing via BizProfile",
@@ -302,7 +284,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "755 Sansome St, San Francisco",
     coordinates: [-122.402, 37.7972],
     founded: 2019,
-    featuredTier: "hot",
     sourceUrl:
       "https://bandana.com/companies/e362a6da-588c-42f7-bd1a-538c52757bb7/locations/418a9ab4-a428-4a8b-94b6-2d78bbbcaf0f",
     sourceLabel: "Bandana company directory",
@@ -319,7 +300,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "303 2nd St, San Francisco",
     coordinates: [-122.3958, 37.7849],
     founded: 2022,
-    featuredTier: "hot",
     sourceUrl:
       "https://websets.exa.ai/websets/directory/elevenlabs-offices",
     sourceLabel: "Exa directory listing",
@@ -336,7 +316,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "111 Maiden Lane, San Francisco",
     coordinates: [-122.4062, 37.788],
     founded: 2020,
-    featuredTier: "hot",
     sourceUrl: "https://www.cbinsights.com/company/qordoba",
     sourceLabel: "CB Insights company profile",
   },
@@ -352,7 +331,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "677 Harrison St, San Francisco",
     coordinates: [-122.3969, 37.7829],
     founded: 2022,
-    featuredTier: "hot",
     sourceUrl: "https://www.bizprofile.net/ca/san-francisco/11x-ai-inc",
     sourceLabel: "California business filing via BizProfile",
   },
@@ -368,7 +346,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "185 Clara St, San Francisco",
     coordinates: [-122.4017, 37.7799],
     founded: 2018,
-    featuredTier: "hot",
     sourceUrl: "https://opengovus.com/sam-entity/C1MPKNUNE761",
     sourceLabel: "SAM.gov entity registration",
   },
@@ -384,7 +361,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "2261 Market St, San Francisco",
     coordinates: [-122.4322, 37.7647],
     founded: 2021,
-    featuredTier: "hot",
     sourceUrl:
       "https://files.nitrd.gov/90-fr-9088/Imbue-AI-RFI-2025.pdf",
     sourceLabel: "OSTP public filing",
@@ -401,7 +377,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "325 5th St, San Francisco",
     coordinates: [-122.4031, 37.7801],
     founded: 2022,
-    featuredTier: "hot",
     sourceUrl: "https://www.builtinsf.com/company/llamaindex",
     sourceLabel: "Built In SF company profile",
   },
@@ -417,7 +392,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "42 Decatur St, San Francisco",
     coordinates: [-122.4063, 37.7726],
     founded: 2023,
-    featuredTier: "scene",
     sourceUrl:
       "https://www.bizprofile.net/ca/san-francisco/langchain-inc",
     sourceLabel: "California business filing via BizProfile",
@@ -434,7 +408,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "400 Alabama St, San Francisco",
     coordinates: [-122.4124, 37.7641],
     founded: 2017,
-    featuredTier: "scene",
     sourceUrl:
       "https://www.bizprofile.net/ca/san-francisco/weights-and-biases-inc",
     sourceLabel: "California business filing via BizProfile",
@@ -451,7 +424,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "375 Alabama St, San Francisco",
     coordinates: [-122.4123, 37.7645],
     founded: 2017,
-    featuredTier: "scene",
     sourceUrl: "https://www.descript.com/terms",
     sourceLabel: "Descript Terms of Service",
   },
@@ -467,7 +439,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "600 Townsend St, San Francisco",
     coordinates: [-122.4018, 37.7718],
     founded: 2020,
-    featuredTier: "scene",
     sourceUrl: "https://www.cbinsights.com/company/tome-1",
     sourceLabel: "CB Insights company profile",
   },
@@ -483,7 +454,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "166 Geary St, San Francisco",
     coordinates: [-122.406, 37.7877],
     founded: 2024,
-    featuredTier: "scene",
     sourceUrl:
       "https://www.bizprofile.net/ca/san-francisco/browserbase-inc",
     sourceLabel: "California business filing via BizProfile",
@@ -500,7 +470,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "510 Treat Ave, San Francisco",
     coordinates: [-122.4145, 37.762],
     founded: 2018,
-    featuredTier: "scene",
     sourceUrl: "https://www.zoominfo.com/c/labelbox-inc/452502399",
     sourceLabel: "ZoomInfo company listing",
   },
@@ -516,7 +485,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "345 California St, San Francisco",
     coordinates: [-122.4005, 37.7931],
     founded: 2017,
-    featuredTier: "scene",
     sourceUrl:
       "https://www.cbinsights.com/company/forethought-technologies",
     sourceLabel: "CB Insights company profile",
@@ -533,7 +501,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "400 Montgomery St, San Francisco",
     coordinates: [-122.4027, 37.7929],
     founded: 2013,
-    featuredTier: "scene",
     sourceUrl:
       "https://github.com/sourcegraph/handbook/blob/main/content/company-info-and-process/about-sourcegraph/general-office-info.md",
     sourceLabel: "Sourcegraph public handbook",
@@ -550,7 +517,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "444 Townsend St, San Francisco",
     coordinates: [-122.3983, 37.7746],
     founded: 2021,
-    featuredTier: "scene",
     sourceUrl: "https://www.cbinsights.com/company/wispr",
     sourceLabel: "CB Insights company profile",
   },
@@ -566,7 +532,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "292 Ivy St, San Francisco",
     coordinates: [-122.4229, 37.7774],
     founded: 2023,
-    featuredTier: "scene",
     sourceUrl: "https://craft.co/bland-ai/locations",
     sourceLabel: "Craft locations page",
   },
@@ -582,7 +547,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "160 Spear St, San Francisco",
     coordinates: [-122.3936, 37.7912],
     founded: 2013,
-    featuredTier: "core",
     sourceUrl:
       "https://www.databricks.com/company/contact/office-locations",
     sourceLabel: "Databricks official office locations",
@@ -599,7 +563,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "255 California St, San Francisco",
     coordinates: [-122.3997, 37.7932],
     founded: 2019,
-    featuredTier: "hot",
     sourceUrl:
       "https://salestools.io/en/report/glean-headquarters",
     sourceLabel: "Salestools headquarters listing",
@@ -616,7 +579,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "181 Fremont St, San Francisco",
     coordinates: [-122.3953, 37.7901],
     founded: 2023,
-    featuredTier: "hot",
     sourceUrl:
       "https://www.builtinsf.com/company/mercor",
     sourceLabel: "Built In SF company profile",
@@ -633,7 +595,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "457 Bryant St, San Francisco",
     coordinates: [-122.3969, 37.7823],
     founded: 2021,
-    featuredTier: "hot",
     sourceUrl:
       "https://talent.amplifypartners.com/jobs/luma-ai",
     sourceLabel: "Amplify Partners job listing",
@@ -650,7 +611,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "580 California St, San Francisco",
     coordinates: [-122.4044, 37.7926],
     founded: 2022,
-    featuredTier: "hot",
     sourceUrl:
       "https://exa.ai/websets/directory/magic-ai-offices",
     sourceLabel: "Exa directory listing",
@@ -667,7 +627,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "575 Market St, San Francisco",
     coordinates: [-122.4005, 37.7893],
     founded: 2020,
-    featuredTier: "hot",
     sourceUrl:
       "https://www.hebbia.com/newsroom/hebbia-opens-doors-in-san-francisco-and-welcomes-new-cto",
     sourceLabel: "Hebbia newsroom",
@@ -684,7 +643,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "2261 Market St, San Francisco",
     coordinates: [-122.4318, 37.765],
     founded: 2019,
-    featuredTier: "scene",
     sourceUrl: "https://replicate.com/privacy",
     sourceLabel: "Replicate privacy policy",
   },
@@ -700,7 +658,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "156 2nd St, San Francisco",
     coordinates: [-122.3975, 37.7871],
     founded: 2021,
-    featuredTier: "scene",
     sourceUrl: "https://www.cbinsights.com/company/modal-1",
     sourceLabel: "CB Insights company profile",
   },
@@ -716,7 +673,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "2261 Market St, San Francisco",
     coordinates: [-122.432, 37.7644],
     founded: 2022,
-    featuredTier: "scene",
     sourceUrl:
       "https://opengovus.com/san-francisco-business/1304237-05-221",
     sourceLabel: "SF business filing via OpenGovUS",
@@ -733,7 +689,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "575 Market St, San Francisco",
     coordinates: [-122.4001, 37.7897],
     founded: 2021,
-    featuredTier: "scene",
     sourceUrl: "https://www.jasper.ai/legal/terms",
     sourceLabel: "Jasper Terms of Service",
   },
@@ -749,7 +704,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "235 Pine St, San Francisco",
     coordinates: [-122.3998, 37.7922],
     founded: 2017,
-    featuredTier: "scene",
     sourceUrl:
       "https://salestools.io/en/report/cresta-headquarters",
     sourceLabel: "Salestools headquarters listing",
@@ -766,7 +720,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "244 Jackson St, San Francisco",
     coordinates: [-122.3999, 37.7969],
     founded: 2015,
-    featuredTier: "scene",
     sourceUrl: "https://craft.co/primer-ai/locations",
     sourceLabel: "Craft locations page",
   },
@@ -782,7 +735,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "208 Utah St, San Francisco",
     coordinates: [-122.4043, 37.7632],
     founded: 2018,
-    featuredTier: "scene",
     sourceUrl:
       "https://sfstandard.com/2025/10/07/abridge-ai-san-francisco-office-leasing/",
     sourceLabel: "SF Standard office lease report",
@@ -799,7 +751,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "55 Hawthorne St, San Francisco",
     coordinates: [-122.3985, 37.7862],
     founded: 2022,
-    featuredTier: "scene",
     sourceUrl: "https://www.builtinsf.com/company/distyl-ai",
     sourceLabel: "Built In SF company profile",
   },
@@ -815,7 +766,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "425 California St, San Francisco",
     coordinates: [-122.4018, 37.7929],
     founded: 2019,
-    featuredTier: "scene",
     sourceUrl:
       "https://www.cbinsights.com/company/nightfall-ai",
     sourceLabel: "CB Insights company profile",
@@ -832,7 +782,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "350 Rhode Island St, San Francisco",
     coordinates: [-122.4031, 37.766],
     founded: 2022,
-    featuredTier: "scene",
     sourceUrl:
       "https://therealdeal.com/san-francisco/2023/08/10/adept-ai-labs-to-lease-35k-sf-in-san-franciscos-area-ai/",
     sourceLabel: "The Real Deal lease record",
@@ -849,7 +798,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "548 Market St, San Francisco",
     coordinates: [-122.3998, 37.7899],
     founded: 2015,
-    featuredTier: "scene",
     sourceUrl: "https://craft.co/deepgram/locations",
     sourceLabel: "Craft locations page",
   },
@@ -865,7 +813,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "650 5th St, San Francisco",
     coordinates: [-122.3972, 37.7759],
     founded: 2017,
-    featuredTier: "scene",
     sourceUrl:
       "https://www.bbb.org/us/ca/san-francisco/profile/lab/woebot-labs-inc-1116-889119",
     sourceLabel: "Better Business Bureau listing",
@@ -882,7 +829,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "548 Market St, San Francisco",
     coordinates: [-122.4003, 37.7903],
     founded: 2018,
-    featuredTier: "scene",
     sourceUrl: "https://www.cbinsights.com/company/rad-ai",
     sourceLabel: "CB Insights company profile",
   },
@@ -898,7 +844,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "320 Judah St, San Francisco",
     coordinates: [-122.4606, 37.7612],
     founded: 2017,
-    featuredTier: "scene",
     sourceUrl:
       "https://www.cbinsights.com/company/assemblyai",
     sourceLabel: "CB Insights company profile",
@@ -915,7 +860,6 @@ export const COMPANIES: Company[] = [
     locationLabel: "335 Pioneer Way, Mountain View",
     coordinates: [-122.0668804, 37.3862565],
     founded: 2005,
-    featuredTier: "core",
     logoUrl: "https://www.google.com/s2/favicons?domain=ycombinator.com&sz=128",
     hideFromSidebar: true,
     mapSprite: "boss",

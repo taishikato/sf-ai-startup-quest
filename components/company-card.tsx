@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowUpRight, Flame, MapPin } from "lucide-react"
+import { ArrowUpRight, MapPin } from "lucide-react"
 
 import {
   CATEGORY_COLORS,
@@ -17,12 +17,6 @@ type CompanyCardProps = {
   active?: boolean
   compact?: boolean
   onSelect?: (slug: string) => void
-}
-
-const tierLabel: Record<Company["featuredTier"], string> = {
-  core: "★ Core",
-  hot: "🔥 Hot",
-  scene: "● Scene",
 }
 
 export function CompanyCard({
@@ -58,18 +52,11 @@ export function CompanyCard({
                 >
                   {company.category}
                 </span>
-                <span
-                  className={cn(
-                    "text-[8px] font-bold",
-                    company.mapSprite === "boss"
-                      ? "text-[#f26522]"
-                      : "text-[#f0f7e6]/50",
-                  )}
-                >
-                  {company.mapSprite === "boss"
-                    ? "BOSS"
-                    : tierLabel[company.featuredTier]}
-                </span>
+                {company.mapSprite === "boss" ? (
+                  <span className="text-[8px] font-bold text-[#f26522]">
+                    BOSS
+                  </span>
+                ) : null}
               </div>
               <h3 className="mt-1 text-sm font-bold text-[#f0f7e6]">
                 {company.name}
@@ -126,16 +113,7 @@ export function CompanyCard({
             </span>
             {company.mapSprite === "boss" ? (
               <span className="text-[10px] font-bold text-[#f26522]">BOSS</span>
-            ) : company.featuredTier === "hot" ? (
-              <span className="flex items-center gap-1 text-[10px] font-bold text-[#ff6b6b]">
-                <Flame className="size-3" />
-                {tierLabel[company.featuredTier]}
-              </span>
-            ) : (
-              <span className="text-[10px] font-bold text-[#f0f7e6]/50">
-                {tierLabel[company.featuredTier]}
-              </span>
-            )}
+            ) : null}
           </div>
           <div className="mt-3 flex items-center gap-3">
             <CompanyLogo company={company} monogram={monogram} />

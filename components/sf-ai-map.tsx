@@ -12,8 +12,6 @@ import {
 } from "@/lib/companies"
 import { cn } from "@/lib/utils"
 
-const featuredOrder = ["core", "hot", "scene"] as const
-
 export function SfAiMap() {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
@@ -98,16 +96,7 @@ export function SfAiMap() {
           .toLowerCase()
           .includes(query)
       })
-      .sort((left, right) => {
-        const tierDelta =
-          featuredOrder.indexOf(left.featuredTier) - featuredOrder.indexOf(right.featuredTier)
-
-        if (tierDelta !== 0) {
-          return tierDelta
-        }
-
-        return left.name.localeCompare(right.name)
-      })
+      .sort((left, right) => left.name.localeCompare(right.name))
   }, [category, deferredSearch])
 
   const selectedCompany =
