@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ArrowUpRight, MapPin } from "lucide-react"
+import { useState } from "react";
+import { ArrowUpRight, MapPin } from "lucide-react";
 
 import {
   CATEGORY_COLORS,
@@ -9,15 +9,15 @@ import {
   getCompanyLogoUrl,
   getCompanyMonogram,
   type Company,
-} from "@/lib/companies"
-import { cn } from "@/lib/utils"
+} from "@/lib/companies";
+import { cn } from "@/lib/utils";
 
 type CompanyCardProps = {
-  company: Company
-  active?: boolean
-  compact?: boolean
-  onSelect?: (slug: string) => void
-}
+  company: Company;
+  active?: boolean;
+  compact?: boolean;
+  onSelect?: (slug: string) => void;
+};
 
 export function CompanyCard({
   company,
@@ -25,8 +25,8 @@ export function CompanyCard({
   compact = false,
   onSelect,
 }: CompanyCardProps) {
-  const monogram = getCompanyMonogram(company)
-  const categoryColor = CATEGORY_COLORS[company.category]
+  const monogram = getCompanyMonogram(company);
+  const categoryColor = CATEGORY_COLORS[company.category];
 
   const compactBody = (
     <article
@@ -87,7 +87,7 @@ export function CompanyCard({
         </div>
       </div>
     </article>
-  )
+  );
 
   const body = (
     <article
@@ -138,7 +138,7 @@ export function CompanyCard({
       </p>
 
       <div className="mt-4 border-2 border-[#3a3a5e] bg-[#2a2a4e] px-4 py-3">
-        <div className="font-[family-name:var(--font-pixel)] text-[7px] uppercase tracking-wider text-[#ffe66d]">
+        <div className="font-[family-name:var(--font-pixel)] text-[7px] tracking-wider text-[#ffe66d] uppercase">
           Why it matters
         </div>
         <p className="mt-2 text-sm leading-6 text-[#f0f7e6]">
@@ -162,12 +162,12 @@ export function CompanyCard({
         </a>
       </div>
     </article>
-  )
+  );
 
-  const cardBody = compact ? compactBody : body
+  const cardBody = compact ? compactBody : body;
 
   if (!onSelect || compact === false) {
-    return cardBody
+    return cardBody;
   }
 
   return (
@@ -177,15 +177,15 @@ export function CompanyCard({
       onClick={() => onSelect(company.slug)}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault()
-          onSelect(company.slug)
+          event.preventDefault();
+          onSelect(company.slug);
         }
       }}
       className="w-full text-left outline-none"
     >
       {cardBody}
     </div>
-  )
+  );
 }
 
 function CompanyLogo({
@@ -193,12 +193,12 @@ function CompanyLogo({
   monogram,
   compact = false,
 }: {
-  company: Company
-  monogram: string
-  compact?: boolean
+  company: Company;
+  monogram: string;
+  compact?: boolean;
 }) {
-  const [showFallback, setShowFallback] = useState(false)
-  const categoryColor = CATEGORY_COLORS[company.category]
+  const [showFallback, setShowFallback] = useState(false);
+  const categoryColor = CATEGORY_COLORS[company.category];
 
   return (
     <div
@@ -225,5 +225,5 @@ function CompanyLogo({
         />
       )}
     </div>
-  )
+  );
 }

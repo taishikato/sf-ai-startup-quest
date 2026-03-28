@@ -5,9 +5,9 @@ export const COMPANY_CATEGORIES = [
   "Infra",
   "Agents",
   "Vertical AI",
-] as const
+] as const;
 
-export type CompanyCategory = (typeof COMPANY_CATEGORIES)[number]
+export type CompanyCategory = (typeof COMPANY_CATEGORIES)[number];
 
 /**
  * Distinct, saturated hues for map + UI so categories read clearly against
@@ -20,64 +20,66 @@ export const CATEGORY_COLORS: Record<CompanyCategory, string> = {
   Infra: "#7b1fa2",
   Agents: "#1565c0",
   "Vertical AI": "#e65100",
-}
+};
 
 /** Text on filled category pills in the dark sidebar (high contrast). */
-export function categoryPillForeground(category: CompanyCategory): "#ffffff" | "#1a1a2e" {
-  return category === "Devtools" ? "#1a1a2e" : "#ffffff"
+export function categoryPillForeground(
+  category: CompanyCategory
+): "#ffffff" | "#1a1a2e" {
+  return category === "Devtools" ? "#1a1a2e" : "#ffffff";
 }
 
 export type Company = {
-  slug: string
-  name: string
-  website: string
-  shortDescription: string
-  whyItMatters: string
-  category: CompanyCategory
-  locationLabel: string
-  coordinates: [number, number]
-  founded: number
-  logoUrl?: string
+  slug: string;
+  name: string;
+  website: string;
+  shortDescription: string;
+  whyItMatters: string;
+  category: CompanyCategory;
+  locationLabel: string;
+  coordinates: [number, number];
+  founded: number;
+  logoUrl?: string;
   /** When true, the card is omitted from the sidebar until the user searches. */
-  hideFromSidebar?: boolean
+  hideFromSidebar?: boolean;
   /** Map marker style — "boss" uses a larger, high-threat sprite. */
-  mapSprite?: "default" | "boss"
-  sourceUrl: string
-  sourceLabel: string
-}
+  mapSprite?: "default" | "boss";
+  sourceUrl: string;
+  sourceLabel: string;
+};
 
 /** Slug for the YC HQ landmark (not an SF startup; shown as a map boss). */
-export const YC_BOSS_SLUG = "y-combinator" as const
+export const YC_BOSS_SLUG = "y-combinator" as const;
 
 export function getCompanyMonogram(company: Company) {
   if (company.name === "11x") {
-    return "11"
+    return "11";
   }
 
   const parts = company.name
     .replace(/[^a-zA-Z0-9 ]/g, " ")
     .split(" ")
-    .filter(Boolean)
+    .filter(Boolean);
 
   if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   }
 
-  return company.name.slice(0, 2).toUpperCase()
+  return company.name.slice(0, 2).toUpperCase();
 }
 
 export function getCompanyDomain(company: Company) {
-  return new URL(company.website).hostname
+  return new URL(company.website).hostname;
 }
 
 export function getCompanyLogoUrl(company: Company) {
   if (company.logoUrl) {
-    return company.logoUrl
+    return company.logoUrl;
   }
 
-  const domain = getCompanyDomain(company)
+  const domain = getCompanyDomain(company);
 
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 }
 
 // Only companies with a public, source-backed SF office location are included below.
@@ -87,7 +89,8 @@ export const COMPANIES: Company[] = [
     slug: "openai",
     name: "OpenAI",
     website: "https://openai.com",
-    shortDescription: "Frontier AI lab behind ChatGPT and a huge share of the current AI wave.",
+    shortDescription:
+      "Frontier AI lab behind ChatGPT and a huge share of the current AI wave.",
     whyItMatters: "The obvious anchor on any map of modern SF AI.",
     category: "Core Labs",
     locationLabel: "1455 3rd St, San Francisco",
@@ -101,7 +104,8 @@ export const COMPANIES: Company[] = [
     slug: "anthropic",
     name: "Anthropic",
     website: "https://www.anthropic.com",
-    shortDescription: "Claude-maker focused on frontier models, safety, and serious product adoption.",
+    shortDescription:
+      "Claude-maker focused on frontier models, safety, and serious product adoption.",
     whyItMatters: "If OpenAI is one pole of SF AI, Anthropic is the other.",
     category: "Core Labs",
     locationLabel: "548 Market St, San Francisco",
@@ -114,8 +118,10 @@ export const COMPANIES: Company[] = [
     slug: "perplexity",
     name: "Perplexity",
     website: "https://www.perplexity.ai",
-    shortDescription: "Answer engine with a strong consumer feel and nonstop mindshare.",
-    whyItMatters: "One of the clearest consumer-facing AI stories to come out of SF.",
+    shortDescription:
+      "Answer engine with a strong consumer feel and nonstop mindshare.",
+    whyItMatters:
+      "One of the clearest consumer-facing AI stories to come out of SF.",
     category: "Consumer AI",
     locationLabel: "115 Sansome St, San Francisco",
     coordinates: [-122.4010654, 37.7914533],
@@ -127,7 +133,8 @@ export const COMPANIES: Company[] = [
     slug: "scale-ai",
     name: "Scale AI",
     website: "https://scale.com",
-    shortDescription: "Data, evaluation, and enterprise infrastructure for training and deploying AI.",
+    shortDescription:
+      "Data, evaluation, and enterprise infrastructure for training and deploying AI.",
     whyItMatters: "Too central to the SF AI ecosystem to leave off the map.",
     category: "Infra",
     locationLabel: "650 Townsend St, San Francisco",
@@ -140,8 +147,10 @@ export const COMPANIES: Company[] = [
     slug: "baseten",
     name: "Baseten",
     website: "https://www.baseten.com",
-    shortDescription: "Inference platform for shipping AI products fast with production-ready performance.",
-    whyItMatters: "A strong infra name with builder credibility and a sharp product story.",
+    shortDescription:
+      "Inference platform for shipping AI products fast with production-ready performance.",
+    whyItMatters:
+      "A strong infra name with builder credibility and a sharp product story.",
     category: "Infra",
     locationLabel: "575 Sutter St, San Francisco",
     coordinates: [-122.4097317, 37.7888158],
@@ -153,8 +162,10 @@ export const COMPANIES: Company[] = [
     slug: "harvey",
     name: "Harvey",
     website: "https://www.harvey.ai",
-    shortDescription: "Legal AI company building one of the clearest vertical AI success stories.",
-    whyItMatters: "Shows how much of SF AI is about real workflows, not just foundation models.",
+    shortDescription:
+      "Legal AI company building one of the clearest vertical AI success stories.",
+    whyItMatters:
+      "Shows how much of SF AI is about real workflows, not just foundation models.",
     category: "Vertical AI",
     locationLabel: "575 Market St, San Francisco",
     coordinates: [-122.4003752, 37.7895414],
@@ -252,8 +263,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "1875 Mission St, San Francisco",
     coordinates: [-122.4198, 37.7671],
     founded: 2023,
-    sourceUrl:
-      "https://www.bizprofile.net/ca/san-francisco/cognition-ai-inc",
+    sourceUrl: "https://www.bizprofile.net/ca/san-francisco/cognition-ai-inc",
     sourceLabel: "California business filing via BizProfile",
   },
   {
@@ -300,8 +310,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "303 2nd St, San Francisco",
     coordinates: [-122.3958, 37.7849],
     founded: 2022,
-    sourceUrl:
-      "https://websets.exa.ai/websets/directory/elevenlabs-offices",
+    sourceUrl: "https://websets.exa.ai/websets/directory/elevenlabs-offices",
     sourceLabel: "Exa directory listing",
   },
   {
@@ -361,8 +370,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "2261 Market St, San Francisco",
     coordinates: [-122.4322, 37.7647],
     founded: 2021,
-    sourceUrl:
-      "https://files.nitrd.gov/90-fr-9088/Imbue-AI-RFI-2025.pdf",
+    sourceUrl: "https://files.nitrd.gov/90-fr-9088/Imbue-AI-RFI-2025.pdf",
     sourceLabel: "OSTP public filing",
   },
   {
@@ -392,8 +400,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "42 Decatur St, San Francisco",
     coordinates: [-122.4063, 37.7726],
     founded: 2023,
-    sourceUrl:
-      "https://www.bizprofile.net/ca/san-francisco/langchain-inc",
+    sourceUrl: "https://www.bizprofile.net/ca/san-francisco/langchain-inc",
     sourceLabel: "California business filing via BizProfile",
   },
   {
@@ -402,8 +409,7 @@ export const COMPANIES: Company[] = [
     website: "https://wandb.ai",
     shortDescription:
       "ML developer platform for experiment tracking, model management, and dataset versioning.",
-    whyItMatters:
-      "Ubiquitous MLOps tool used by OpenAI, NVIDIA, and Meta.",
+    whyItMatters: "Ubiquitous MLOps tool used by OpenAI, NVIDIA, and Meta.",
     category: "Infra",
     locationLabel: "400 Alabama St, San Francisco",
     coordinates: [-122.4124, 37.7641],
@@ -454,8 +460,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "166 Geary St, San Francisco",
     coordinates: [-122.406, 37.7877],
     founded: 2024,
-    sourceUrl:
-      "https://www.bizprofile.net/ca/san-francisco/browserbase-inc",
+    sourceUrl: "https://www.bizprofile.net/ca/san-francisco/browserbase-inc",
     sourceLabel: "California business filing via BizProfile",
   },
   {
@@ -479,14 +484,12 @@ export const COMPANIES: Company[] = [
     website: "https://forethought.ai",
     shortDescription:
       "AI agents platform automating customer support ticket resolution for enterprises.",
-    whyItMatters:
-      "Early mover in AI-powered customer support automation.",
+    whyItMatters: "Early mover in AI-powered customer support automation.",
     category: "Agents",
     locationLabel: "345 California St, San Francisco",
     coordinates: [-122.4005, 37.7931],
     founded: 2017,
-    sourceUrl:
-      "https://www.cbinsights.com/company/forethought-technologies",
+    sourceUrl: "https://www.cbinsights.com/company/forethought-technologies",
     sourceLabel: "CB Insights company profile",
   },
   {
@@ -547,8 +550,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "160 Spear St, San Francisco",
     coordinates: [-122.3936, 37.7912],
     founded: 2013,
-    sourceUrl:
-      "https://www.databricks.com/company/contact/office-locations",
+    sourceUrl: "https://www.databricks.com/company/contact/office-locations",
     sourceLabel: "Databricks official office locations",
   },
   {
@@ -563,8 +565,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "255 California St, San Francisco",
     coordinates: [-122.3997, 37.7932],
     founded: 2019,
-    sourceUrl:
-      "https://salestools.io/en/report/glean-headquarters",
+    sourceUrl: "https://salestools.io/en/report/glean-headquarters",
     sourceLabel: "Salestools headquarters listing",
   },
   {
@@ -579,8 +580,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "181 Fremont St, San Francisco",
     coordinates: [-122.3953, 37.7901],
     founded: 2023,
-    sourceUrl:
-      "https://www.builtinsf.com/company/mercor",
+    sourceUrl: "https://www.builtinsf.com/company/mercor",
     sourceLabel: "Built In SF company profile",
   },
   {
@@ -595,8 +595,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "457 Bryant St, San Francisco",
     coordinates: [-122.3969, 37.7823],
     founded: 2021,
-    sourceUrl:
-      "https://talent.amplifypartners.com/jobs/luma-ai",
+    sourceUrl: "https://talent.amplifypartners.com/jobs/luma-ai",
     sourceLabel: "Amplify Partners job listing",
   },
   {
@@ -611,8 +610,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "580 California St, San Francisco",
     coordinates: [-122.4044, 37.7926],
     founded: 2022,
-    sourceUrl:
-      "https://exa.ai/websets/directory/magic-ai-offices",
+    sourceUrl: "https://exa.ai/websets/directory/magic-ai-offices",
     sourceLabel: "Exa directory listing",
   },
   {
@@ -673,8 +671,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "2261 Market St, San Francisco",
     coordinates: [-122.432, 37.7644],
     founded: 2022,
-    sourceUrl:
-      "https://opengovus.com/san-francisco-business/1304237-05-221",
+    sourceUrl: "https://opengovus.com/san-francisco-business/1304237-05-221",
     sourceLabel: "SF business filing via OpenGovUS",
   },
   {
@@ -704,8 +701,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "235 Pine St, San Francisco",
     coordinates: [-122.3998, 37.7922],
     founded: 2017,
-    sourceUrl:
-      "https://salestools.io/en/report/cresta-headquarters",
+    sourceUrl: "https://salestools.io/en/report/cresta-headquarters",
     sourceLabel: "Salestools headquarters listing",
   },
   {
@@ -766,8 +762,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "425 California St, San Francisco",
     coordinates: [-122.4018, 37.7929],
     founded: 2019,
-    sourceUrl:
-      "https://www.cbinsights.com/company/nightfall-ai",
+    sourceUrl: "https://www.cbinsights.com/company/nightfall-ai",
     sourceLabel: "CB Insights company profile",
   },
   {
@@ -844,8 +839,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "320 Judah St, San Francisco",
     coordinates: [-122.4606, 37.7612],
     founded: 2017,
-    sourceUrl:
-      "https://www.cbinsights.com/company/assemblyai",
+    sourceUrl: "https://www.cbinsights.com/company/assemblyai",
     sourceLabel: "CB Insights company profile",
   },
   {
@@ -863,7 +857,8 @@ export const COMPANIES: Company[] = [
     logoUrl: "https://www.google.com/s2/favicons?domain=ycombinator.com&sz=128",
     hideFromSidebar: true,
     mapSprite: "boss",
-    sourceUrl: "https://www.openstreetmap.org/search?query=335%20Pioneer%20Way%20Mountain%20View%20CA",
+    sourceUrl:
+      "https://www.openstreetmap.org/search?query=335%20Pioneer%20Way%20Mountain%20View%20CA",
     sourceLabel: "OpenStreetMap / Nominatim geocode",
   },
-]
+];
