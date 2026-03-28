@@ -16,6 +16,7 @@ import {
   type CompanyCategory,
 } from "@/lib/companies"
 import { PixelClouds } from "@/components/pixel-clouds"
+import { cn } from "@/lib/utils"
 
 type MapShellProps = {
   companies: Company[]
@@ -647,9 +648,16 @@ export function MapShell({
           type="button"
           onClick={onToggleMute}
           aria-label={isAudioMuted ? "Unmute audio" : "Mute audio"}
-          className="size-10 border-[3px] border-[#342414] bg-[#f4ecd2] p-0 text-[#4c3926] shadow-[4px_4px_0px_#342414] hover:bg-[#e7d8ae]"
+          className={cn(
+            "size-10 border-[3px] border-[#342414] bg-[#f4ecd2] p-0 text-[#4c3926] shadow-[4px_4px_0px_#342414] hover:bg-[#e7d8ae]",
+            !isAudioMuted && "audio-unmuted-btn",
+          )}
         >
-          {isAudioMuted ? <VolumeX className="size-3.5" /> : <Volume2 className="size-3.5" />}
+          {isAudioMuted ? (
+            <VolumeX className="size-3.5" />
+          ) : (
+            <Volume2 className="volume-unmuted-icon size-3.5" />
+          )}
         </Button>
       </div>
       <div className="pointer-events-none absolute right-4 top-16 hidden flex-col gap-1 lg:flex">
@@ -695,6 +703,50 @@ export function MapShell({
 
         .maplibregl-ctrl-icon {
           filter: sepia(1) saturate(0.8) brightness(0.45);
+        }
+
+        @keyframes volume-unmuted-beat {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          40% {
+            transform: scale(1.22);
+            opacity: 0.88;
+          }
+          55% {
+            transform: scale(1.08);
+            opacity: 1;
+          }
+        }
+
+        @keyframes audio-unmuted-ring {
+          0%,
+          100% {
+            box-shadow: 4px 4px 0 #342414;
+          }
+          50% {
+            box-shadow:
+              4px 4px 0 #342414,
+              0 0 0 2px rgba(154, 77, 48, 0.45);
+          }
+        }
+
+        .volume-unmuted-icon {
+          transform-origin: center;
+          animation: volume-unmuted-beat 1.1s ease-in-out infinite;
+        }
+
+        .audio-unmuted-btn {
+          animation: audio-unmuted-ring 1.1s ease-in-out infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .volume-unmuted-icon,
+          .audio-unmuted-btn {
+            animation: none !important;
+          }
         }
       `}</style>
     </div>
