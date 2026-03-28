@@ -788,7 +788,6 @@ export function MapShell({
     map.touchZoomRotate.disableRotation()
     map.addControl(
       new maplibregl.NavigationControl({ showCompass: false }),
-      // Bottom-right so the category legend can use the top-right without overlap.
       "bottom-right"
     )
     map.on("load", () => {
@@ -953,22 +952,6 @@ export function MapShell({
         >
           <Github className="size-3.5" strokeWidth={2} aria-hidden />
         </a>
-      </div>
-      <div className="pointer-events-none absolute top-4 right-4 hidden flex-col gap-1 lg:flex">
-        {Object.entries(CATEGORY_COLORS).map(([cat, color]) => (
-          <div
-            key={cat}
-            className="flex items-center gap-1.5 border-2 border-[#342414] bg-[#f4ecd2] px-2 py-1 shadow-[3px_3px_0px_rgba(52,36,20,0.75)]"
-          >
-            <div
-              className="size-3 border-2 border-[#342414]"
-              style={{ backgroundColor: color, boxShadow: "2px 2px 0 #342414" }}
-            />
-            <span className="text-[9px] font-medium text-[#4c3926]">
-              {cat}
-            </span>
-          </div>
-        ))}
       </div>
       <style jsx global>{`
         .maplibregl-canvas {
