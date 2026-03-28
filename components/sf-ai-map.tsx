@@ -2,10 +2,10 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 
-import { CompanyCard } from "@/components/company-card"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
 import { COMPANIES, type CompanyCategory } from "@/lib/companies"
+import { cn } from "@/lib/utils"
 
 const featuredOrder = ["core", "hot", "scene"] as const
 
@@ -110,19 +110,28 @@ export function SfAiMap() {
   const mapCompanies = filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany]
 
   return (
-    <main className="h-screen overflow-hidden bg-[#1a1a2e]">
-      <section className="mx-auto h-full w-full">
-        <div className="grid h-full min-h-0 lg:grid-cols-[380px_minmax(0,1fr)]">
-          <DiscoveryPanel
-            companies={filteredCompanies}
-            selectedCompany={selectedCompany}
-            search={search}
-            onSearchChange={setSearch}
-            category={category}
-            onCategoryChange={setCategory}
-            onSelectCompany={setSelectedSlug}
-          />
-          <div className="flex min-h-0 flex-col gap-0 overflow-hidden">
+    <main className="h-dvh overflow-hidden bg-[#1a1a2e]">
+      <section className="mx-auto h-full min-h-0 w-full">
+        <div
+          className={cn(
+            "grid h-full min-h-0",
+            "max-lg:grid-rows-[minmax(0,1fr)_minmax(260px,min(52vh,50dvh))]",
+            "lg:grid-cols-[380px_minmax(0,1fr)]",
+            "lg:grid-rows-1",
+          )}
+        >
+          <div className="flex h-full min-h-0 flex-col overflow-hidden">
+            <DiscoveryPanel
+              companies={filteredCompanies}
+              selectedCompany={selectedCompany}
+              search={search}
+              onSearchChange={setSearch}
+              category={category}
+              onCategoryChange={setCategory}
+              onSelectCompany={setSelectedSlug}
+            />
+          </div>
+          <div className="relative h-full min-h-0 overflow-hidden">
             <MapShell
               companies={mapCompanies}
               selectedCompany={selectedCompany}
@@ -130,14 +139,6 @@ export function SfAiMap() {
               isAudioMuted={isAudioMuted}
               onToggleMute={handleToggleMute}
             />
-            <div className="grid gap-3 bg-[#1a1a2e] p-3 lg:hidden">
-              <div className="flex items-center justify-between">
-                <h2 className="font-[family-name:var(--font-pixel)] text-[8px] text-[#4ecdc4]">
-                  Selected
-                </h2>
-              </div>
-              <CompanyCard company={selectedCompany} active />
-            </div>
           </div>
         </div>
       </section>

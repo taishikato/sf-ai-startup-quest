@@ -615,7 +615,7 @@ export function MapShell({
   }, [selectedCompany])
 
   return (
-    <div className="relative h-full overflow-hidden bg-[#cdb98b] lg:min-h-160">
+    <div className="relative h-full min-h-0 overflow-hidden bg-[#cdb98b] lg:min-h-160">
       <div ref={containerRef} className="h-full w-full" />
       <div className="pointer-events-none absolute inset-0 opacity-30">
         <div
@@ -647,12 +647,7 @@ export function MapShell({
           {isAudioMuted ? <VolumeX className="size-3.5" /> : <Volume2 className="size-3.5" />}
         </Button>
       </div>
-      <div className="pointer-events-none absolute right-4 bottom-4 border-[3px] border-[#342414] bg-[#f4ecd2] px-3 py-2 shadow-[4px_4px_0px_#342414]">
-        <span className="font-[family-name:var(--font-pixel)] text-[7px] text-[#4c3926]">
-          ► {selectedCompany.name}
-        </span>
-      </div>
-      <div className="pointer-events-none absolute right-4 top-16 flex flex-col gap-1">
+      <div className="pointer-events-none absolute right-4 top-16 hidden flex-col gap-1 lg:flex">
         {Object.entries(CATEGORY_COLORS).map(([cat, color]) => (
           <div
             key={cat}

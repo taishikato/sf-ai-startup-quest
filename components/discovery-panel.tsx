@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { Search } from "lucide-react"
+import { Github, Search } from "lucide-react"
 
 import { CompanyCard } from "@/components/company-card"
 import {
@@ -62,15 +62,24 @@ export function DiscoveryPanel({
   return (
     <aside className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto border-r-3 border-[#1a1a2e] bg-[#1a1a2e] p-5 text-[#f0f7e6]">
       <div className="space-y-4">
-        <div className="space-y-3">
-          <h1 className="font-[family-name:var(--font-pixel)] text-lg leading-relaxed tracking-tight text-[#ffe66d]">
-            SF AI
-            <br />
-            Startup Map
-          </h1>
-          <div className="font-[family-name:var(--font-pixel)] text-[8px] text-[#4ecdc4]">
-            {companies.length} players on the board
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 space-y-3">
+            <h1 className="font-[family-name:var(--font-pixel)] text-lg leading-relaxed tracking-tight text-[#ffe66d]">
+              SF AI
+              <br />
+              Startup Map
+            </h1>
+            <div className="font-[family-name:var(--font-pixel)] text-[8px] text-[#4ecdc4]">
+              {companies.length} players on the board
+            </div>
           </div>
+          <span
+            className="flex shrink-0 border-2 border-[#3a3a5e] bg-[#2a2a4e] p-2 text-[#f0f7e6]/80 shadow-[2px_2px_0px_#1a1a2e]"
+            title="GitHub"
+            aria-hidden
+          >
+            <Github className="size-5" strokeWidth={2} />
+          </span>
         </div>
       </div>
 
@@ -160,6 +169,13 @@ export function DiscoveryPanel({
             </p>
           </div>
         )}
+      </section>
+
+      <section className="space-y-3 lg:hidden">
+        <h2 className="font-[family-name:var(--font-pixel)] text-[8px] text-[#4ecdc4]">
+          Selected
+        </h2>
+        <CompanyCard company={selectedCompany} active />
       </section>
     </aside>
   )
