@@ -1,40 +1,17 @@
-# SF AI Startup Map
+# SF AI Startup Quest Map
 
-A simple web app for exploring AI-native startups in San Francisco through a map UI with an 8-bit game tone.
+Dragon quest-like map that shows AI startups in SF 🤖
 
-You can move between map markers and the sidebar to quickly browse each startup's category, location, and short description. The UI stays clean and product-like, while the map styling adds a light retro game feel.
+<img width="2106" height="1486" alt="Image" src="https://github.com/user-attachments/assets/7315b2c6-5e4b-4ca5-8411-35e2e583a5b7" />
 
 ## What's This
 
 - A map-based app for browsing AI startups in San Francisco
 - Startup data is maintained in `lib/companies.ts` with source links
-- Built on `maplibre-gl` with an 8-bit / voxel-inspired visual treatment
-- Designed for quickly scanning companies in the sidebar and locating them on the map
-
-## Tech Stack
-
-- Next.js 16
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- MapLibre GL JS
-- Lucide React
-- pnpm
 
 ## Development
 
 ```bash
 pnpm install
 pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the app.
-
-## Scripts
-
-```bash
-pnpm dev
-pnpm build
-pnpm lint
-pnpm typecheck
 ```
