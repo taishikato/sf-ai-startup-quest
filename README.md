@@ -1,15 +1,15 @@
 # SF AI Startup Map
 
-San Francisco の AI-native startup を、8-bit game tone の地図 UI で見て回れるシンプルな web app です。
+A simple web app for exploring AI-native startups in San Francisco through a map UI with an 8-bit game tone.
 
-地図上のマーカーとサイドバーを行き来しながら、各スタートアップのカテゴリ、所在地、概要をすばやく確認できます。UI はプロダクト寄りに保ちつつ、マップ表現には少しレトロゲームっぽい空気感を入れています。
+You can move between map markers and the sidebar to quickly browse each startup's category, location, and short description. The UI stays clean and product-like, while the map styling adds a light retro game feel.
 
 ## What's This
 
-- San Francisco の AI スタートアップを地図上で一覧できるアプリ
-- Startup data はソース付きで `lib/companies.ts` に管理
-- `maplibre-gl` ベースのマップを 8-bit / voxel ライクな見た目に調整
-- サイドバーから会社を探し、地図上で位置を確認できる構成
+- A map-based app for browsing AI startups in San Francisco
+- Startup data is maintained in `lib/companies.ts` with source links
+- Built on `maplibre-gl` with an 8-bit / voxel-inspired visual treatment
+- Designed for quickly scanning companies in the sidebar and locating them on the map
 
 ## Tech Stack
 
