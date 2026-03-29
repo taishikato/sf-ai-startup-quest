@@ -304,6 +304,34 @@ function sd(styles: Partial<CSSStyleDeclaration>) {
   return el;
 }
 
+function getMarkerFloatTiming(slug: string) {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i += 1) {
+    hash = (hash * 31 + slug.charCodeAt(i)) % 10000;
+  }
+
+  return {
+    duration: `${3.9 + (hash % 7) * 0.16}s`,
+    delay: `${((hash >> 1) % 9) * -0.35}s`,
+  };
+}
+
+function createFloatingMarkerFrame(company: Company) {
+  const { duration, delay } = getMarkerFloatTiming(company.slug);
+
+  return sd({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    animationName: "marker-float",
+    animationDuration: duration,
+    animationTimingFunction: "ease-in-out",
+    animationIterationCount: "infinite",
+    animationDelay: delay,
+    willChange: "transform",
+  });
+}
+
 // Logo badge: category-colored frame + light inner pad so logos stay readable.
 function makeLogoBadge(
   company: Company,
@@ -375,12 +403,13 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
     flexDirection: "column",
     alignItems: "center",
   });
+  const sprite = createFloatingMarkerFrame(company);
 
   // Logo badge on top
-  wrapper.appendChild(makeLogoBadge(company, active, dense, accent));
+  sprite.appendChild(makeLogoBadge(company, active, dense, accent));
 
   // High-contrast category bar (readable when markers overlap)
-  wrapper.appendChild(
+  sprite.appendChild(
     sd({
       width: `${badgeW}px`,
       height: "5px",
@@ -422,7 +451,7 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       borderRight: `2px solid ${OL}`,
     })
   );
-  wrapper.appendChild(antenna);
+  sprite.appendChild(antenna);
 
   // Robot head — cool gray so category accent pops on land and water.
   const head = sd({
@@ -460,10 +489,10 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       background: OL,
     })
   );
-  wrapper.appendChild(head);
+  sprite.appendChild(head);
 
   // Robot body
-  wrapper.appendChild(
+  sprite.appendChild(
     sd({
       width: `${Math.round(w * 0.75)}px`,
       height: `${Math.round(h * 0.3)}px`,
@@ -489,7 +518,9 @@ function createSpriteMarker(company: Company, active: boolean, dense: boolean) {
       })
     );
   }
-  wrapper.appendChild(feet);
+  sprite.appendChild(feet);
+
+  wrapper.appendChild(sprite);
 
   // Ground shadow (chunky pixel ellipse, no blur)
   wrapper.appendChild(
@@ -585,12 +616,13 @@ function createBossSpriteMarker(
     alignItems: "center",
     filter: active ? "none" : "brightness(0.97)",
   });
+  const sprite = createFloatingMarkerFrame(company);
 
-  wrapper.appendChild(
+  sprite.appendChild(
     makeBossLogoBadge(company, active, dense, orange, trimCream)
   );
 
-  wrapper.appendChild(
+  sprite.appendChild(
     sd({
       width: `${Math.round(w * 0.92)}px`,
       height: "6px",
@@ -624,7 +656,7 @@ function createBossSpriteMarker(
       })
     );
   }
-  wrapper.appendChild(horns);
+  sprite.appendChild(horns);
 
   const head = sd({
     width: `${w}px`,
@@ -665,7 +697,7 @@ function createBossSpriteMarker(
       borderTop: `2px solid ${orangeDeep}`,
     })
   );
-  wrapper.appendChild(head);
+  sprite.appendChild(head);
 
   const shoulders = sd({
     display: "flex",
@@ -684,9 +716,9 @@ function createBossSpriteMarker(
       })
     );
   }
-  wrapper.appendChild(shoulders);
+  sprite.appendChild(shoulders);
 
-  wrapper.appendChild(
+  sprite.appendChild(
     sd({
       width: `${Math.round(w * 0.72)}px`,
       height: `${Math.round(h * 0.28)}px`,
@@ -712,7 +744,9 @@ function createBossSpriteMarker(
       })
     );
   }
-  wrapper.appendChild(feet);
+  sprite.appendChild(feet);
+
+  wrapper.appendChild(sprite);
 
   wrapper.appendChild(
     sd({
@@ -987,6 +1021,25 @@ export function MapShell({
 
         .maplibregl-ctrl-icon {
           filter: sepia(1) saturate(0.8) brightness(0.45);
+        }
+
+        @keyframes marker-float {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes marker-float {
+            0%,
+            100% {
+              transform: translateY(0);
+            }
+          }
         }
 
         @keyframes volume-unmuted-beat {
