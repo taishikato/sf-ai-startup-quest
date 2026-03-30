@@ -892,4 +892,19 @@ export const COMPANIES: Company[] = [
       "https://www.openstreetmap.org/search?query=335%20Pioneer%20Way%20Mountain%20View%20CA",
     sourceLabel: "OpenStreetMap / Nominatim geocode",
   },
+  {
+    slug: "circleback",
+    name: "Circleback",
+    website: "https://circleback.ai",
+    shortDescription:
+      "AI-powered notes, action items, automations, and search.",
+    whyItMatters:
+      "TIME's top pick for AI note-taking. Captures context from every conversation with powerful search, custom automations, and AI agent integrations.",
+    category: "Consumer AI",
+    locationLabel: "100 Green St, San Francisco",
+    coordinates: [-122.401598, 37.800521],
+    founded: 2023,
+    sourceUrl: "https://circleback.ai",
+    sourceLabel: "Circleback website",
+  },
 ]
