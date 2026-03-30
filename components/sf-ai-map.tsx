@@ -2,6 +2,7 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 
+import type { CityMapConfig } from "@/lib/city-config"
 import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
@@ -9,12 +10,13 @@ import { MapShell } from "@/components/map-shell"
 
 type SfAiMapProps = {
   companies: Company[]
+  config: CityMapConfig
 }
 
-export function SfAiMap({ companies: allCompanies }: SfAiMapProps) {
+export function SfAiMap({ companies: allCompanies, config }: SfAiMapProps) {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
-  const [selectedSlug, setSelectedSlug] = useState("openai")
+  const [selectedSlug, setSelectedSlug] = useState(config.initialSelectedSlug)
   const [isAudioMuted, setIsAudioMuted] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -118,7 +120,7 @@ export function SfAiMap({ companies: allCompanies }: SfAiMapProps) {
       <main className="flex h-dvh items-center justify-center bg-[#1a1a2e] px-6 text-center text-[#f0f7e6]">
         <div>
           <h1 className="font-(family-name:--font-pixel) text-lg text-[#ffe66d]">
-            SF AI Startup Map
+            {config.emptyStateTitle}
           </h1>
           <p className="mt-3 text-sm text-[#f0f7e6]/70">
             No companies are available yet.
@@ -143,6 +145,8 @@ export function SfAiMap({ companies: allCompanies }: SfAiMapProps) {
             <DiscoveryPanel
               companies={filteredCompanies}
               selectedCompany={selectedCompany}
+              titleLines={config.titleLines}
+              searchPlaceholder={config.searchPlaceholder}
               search={search}
               onSearchChange={setSearch}
               category={category}
@@ -154,6 +158,7 @@ export function SfAiMap({ companies: allCompanies }: SfAiMapProps) {
             <MapShell
               companies={mapCompanies}
               selectedCompany={selectedCompany}
+              config={config}
               onSelectCompany={setSelectedSlug}
               isAudioMuted={isAudioMuted}
               onToggleMute={handleToggleMute}
