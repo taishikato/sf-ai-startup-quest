@@ -1,9 +1,9 @@
 import { companyFromRow } from "@/lib/company"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { SfAiMap } from "@/components/sf-ai-map"
 
 export default async function Page() {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("companies")
     .select(
