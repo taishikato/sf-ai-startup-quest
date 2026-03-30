@@ -890,6 +890,21 @@ export const COMPANIES: Company[] = [
     sourceLabel: "Tusk official website",
   },
   {
+    slug: "capy",
+    name: "Capy",
+    website: "https://capy.ai",
+    shortDescription:
+      "Coding platform that orchestrates autonomous cloud agents in parallel, shipping entire development sprints from a single dashboard.",
+    whyItMatters:
+      "Building the developer environment for the agent era — a fast-growing AI coding platform out of YC F24.",
+    category: "Devtools",
+    locationLabel: "495 3rd St, San Francisco",
+    coordinates: [-122.3958575, 37.781653],
+    founded: 2024,
+    sourceUrl: "https://capy.ai",
+    sourceLabel: "Capy official website",
+  },
+  {
     slug: YC_BOSS_SLUG,
     name: "Y Combinator",
     website: "https://www.ycombinator.com",
