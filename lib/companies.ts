@@ -170,8 +170,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "55 Second St, San Francisco",
     coordinates: [-122.40029289081181, 37.78882824961475],
     founded: 2011,
-    sourceUrl:
-      "https://www.intercom.com/about",
+    sourceUrl: "https://www.intercom.com/about",
     sourceLabel: "Intercom about page",
   },
   {
@@ -508,6 +507,22 @@ export const COMPANIES: Company[] = [
     founded: 2018,
     sourceUrl: "https://www.zoominfo.com/c/labelbox-inc/452502399",
     sourceLabel: "ZoomInfo company listing",
+  },
+  {
+    slug: "fal",
+    name: "fal",
+    website: "https://fal.ai",
+    shortDescription:
+      "The world's best generative image, video, and audio models, all in one place. Develop and fine-tune models with serverless GPUs and on-demand clusters.",
+    whyItMatters:
+      "Use our unified API and SDKs to call hundreds of open models or your own LoRAs in minutes. No MLOps, no setup — just plug in and generate.",
+    category: "Infra",
+    locationLabel: "128 Spear St, San Francisco",
+    coordinates: [-122.3936304729652, 37.79205667671866],
+    founded: 2021,
+    logoUrl: "https://fal.ai/fal-icon.svg",
+    sourceUrl: "https://fal.ai/",
+    sourceLabel: "fal website",
   },
   {
     slug: "forethought",
@@ -885,8 +900,7 @@ export const COMPANIES: Company[] = [
     locationLabel: "1885 Mission St, San Francisco",
     coordinates: [-122.419655, 37.766922],
     founded: 2024,
-    sourceUrl:
-      "https://www.usetusk.ai",
+    sourceUrl: "https://www.usetusk.ai",
     sourceLabel: "Tusk official website",
   },
   {
@@ -903,6 +917,21 @@ export const COMPANIES: Company[] = [
     founded: 2024,
     sourceUrl: "https://capy.ai",
     sourceLabel: "Capy official website",
+  },
+  {
+    slug: "composite",
+    name: "Composite",
+    website: "https://composite.com",
+    shortDescription:
+      "Browser automation agent that predicts and executes your next action, doing work on your behalf.",
+    whyItMatters:
+      "Democratizing workflow automation by letting anyone automate browser tasks through natural language.",
+    category: "Agents",
+    locationLabel: "425 2nd St, San Francisco",
+    coordinates: [-122.3942, 37.7846],
+    founded: 2024,
+    sourceUrl: "https://composite.com",
+    sourceLabel: "Composite official website",
   },
   {
     slug: YC_BOSS_SLUG,
@@ -954,5 +983,20 @@ export const COMPANIES: Company[] = [
     sourceUrl:
       "https://www.wework.com/buildings/2-embarcadero-center--san-francisco--CA",
     sourceLabel: "WeWork 2 Embarcadero Center SF",
+  },
+  {
+    slug: "gauge",
+    name: "Gauge",
+    website: "https://withgauge.com",
+    shortDescription:
+      "AI-powered platform that monitors and optimizes brand visibility across generative search engines like ChatGPT, Gemini, and Perplexity.",
+    whyItMatters:
+      "As AI search reshapes how consumers discover brands, Gauge gives marketers the tools to track and improve their presence in this new channel.",
+    category: "Vertical AI",
+    locationLabel: "11 Funston Ave, San Francisco",
+    coordinates: [-122.4723023, 37.7865235],
+    founded: 2024,
+    sourceUrl: "https://withgauge.com",
+    sourceLabel: "Gauge official website",
   },
 ]
