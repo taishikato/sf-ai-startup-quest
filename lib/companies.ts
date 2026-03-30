@@ -897,7 +897,7 @@ export const COMPANIES: Company[] = [
     name: "Circleback",
     website: "https://circleback.ai",
     shortDescription:
-      "AI-powered meeting notes and automations.",
+      "AI-powered notes, action items, automations, and search.",
     whyItMatters:
       "TIME's top pick for AI note-taking. Captures context from every conversation with powerful search, custom automations, and AI agent integrations.",
     category: "Consumer AI",
