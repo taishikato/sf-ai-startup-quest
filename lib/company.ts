@@ -33,7 +33,7 @@ export type Company = {
   shortDescription: string
   category: CompanyCategory
   locationLabel: string
-  city: "sf" | "toronto"
+  city: "sf" | "toronto" | "ny"
   coordinates: [number, number]
   founded: number
   logoUrl?: string

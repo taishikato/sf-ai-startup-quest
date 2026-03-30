@@ -1,5 +1,5 @@
 export type CityMapConfig = {
-  city: "sf" | "toronto"
+  city: "sf" | "toronto" | "ny"
   titleLines: [string, string]
   emptyStateTitle: string
   searchPlaceholder: string
@@ -31,6 +31,19 @@ export const torontoMapConfig: CityMapConfig = {
   searchPlaceholder: "Cohere, agents, health...",
   initialSelectedSlug: "cohere",
   mapCenter: [-79.3832, 43.6532],
+  sourceHref: "https://github.com/taishikato/sf-ai-startup-quest",
+  switchHref: "/ny",
+  switchLabel: "NY",
+  switchAriaLabel: "Open New York AI Startup Map",
+}
+
+export const nyMapConfig: CityMapConfig = {
+  city: "ny",
+  titleLines: ["NY AI", "Startup Map"],
+  emptyStateTitle: "New York AI Startup Map",
+  searchPlaceholder: "Runway, agents, fintech...",
+  initialSelectedSlug: "runway",
+  mapCenter: [-74.006, 40.7128],
   sourceHref: "https://github.com/taishikato/sf-ai-startup-quest",
   switchHref: "/",
   switchLabel: "SF",

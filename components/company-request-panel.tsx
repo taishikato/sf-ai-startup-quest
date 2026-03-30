@@ -8,18 +8,19 @@ import { Button } from "@/components/ui/button"
 import { submitCompanyRequest } from "@/app/actions/company-request"
 
 type CompanyRequestPanelProps = {
-  initialCity: "sf" | "toronto"
+  initialCity: "sf" | "toronto" | "ny"
 }
 
 const WEBSITE_PATTERN = "https?://.+"
 const CITY_OPTIONS = [
   { value: "sf", label: "San Francisco" },
   { value: "toronto", label: "Toronto" },
+  { value: "ny", label: "New York" },
 ] as const
 
 export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [city, setCity] = useState<"sf" | "toronto">(initialCity)
+  const [city, setCity] = useState<"sf" | "toronto" | "ny">(initialCity)
   const [companyName, setCompanyName] = useState("")
   const [shortDescription, setShortDescription] = useState("")
   const [category, setCategory] = useState<CompanyCategory>("Vertical AI")
@@ -198,7 +199,7 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                     <select
                       value={city}
                       onChange={(event) =>
-                        setCity(event.target.value as "sf" | "toronto")
+                        setCity(event.target.value as "sf" | "toronto" | "ny")
                       }
                       className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none focus:border-[#111827]"
                     >
