@@ -2,18 +2,18 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 
-import type { CityMapConfig } from "@/lib/city-config"
 import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
+import type { CityMapConfig } from "@/lib/city-config"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
 
-type SfAiMapProps = {
+type CityMapProps = {
   companies: Company[]
   config: CityMapConfig
 }
 
-export function SfAiMap({ companies: allCompanies, config }: SfAiMapProps) {
+export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
   const [selectedSlug, setSelectedSlug] = useState(config.initialSelectedSlug)

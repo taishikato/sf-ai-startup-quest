@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { torontoMapConfig } from "@/lib/city-config"
 import { companyFromRow } from "@/lib/company"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { SfAiMap } from "@/components/sf-ai-map"
+import { CityMap } from "@/components/city-map"
 
 export const metadata: Metadata = {
   title: "Toronto AI Startup Map: Explore AI Native Startups in Toronto",
@@ -24,7 +24,7 @@ export default async function Page() {
   if (error) throw new Error(`Failed to load companies: ${error.message}`)
 
   return (
-    <SfAiMap
+    <CityMap
       companies={(data ?? []).map(companyFromRow)}
       config={torontoMapConfig}
     />
