@@ -1,14 +1,21 @@
+export type CityId = "sf" | "toronto" | "ny"
+
+export type CitySwitchOption = {
+  city: CityId
+  href: string
+  label: string
+  ariaLabel: string
+}
+
 export type CityMapConfig = {
-  city: "sf" | "toronto" | "ny"
+  city: CityId
   titleLines: [string, string]
   emptyStateTitle: string
   searchPlaceholder: string
   initialSelectedSlug: string
   mapCenter: [number, number]
   sourceHref: string
-  switchHref: string
-  switchLabel: string
-  switchAriaLabel: string
+  switchOptions: CitySwitchOption[]
 }
 
 export const sfMapConfig: CityMapConfig = {
@@ -19,9 +26,20 @@ export const sfMapConfig: CityMapConfig = {
   initialSelectedSlug: "openai",
   mapCenter: [-122.4167, 37.7793],
   sourceHref: "https://github.com/taishikato/sf-ai-startup-quest",
-  switchHref: "/toronto",
-  switchLabel: "TO",
-  switchAriaLabel: "Open Toronto AI Startup Map",
+  switchOptions: [
+    {
+      city: "toronto",
+      href: "/toronto",
+      label: "TO",
+      ariaLabel: "Open Toronto AI Startup Map",
+    },
+    {
+      city: "ny",
+      href: "/ny",
+      label: "NY",
+      ariaLabel: "Open New York AI Startup Map",
+    },
+  ],
 }
 
 export const torontoMapConfig: CityMapConfig = {
@@ -32,9 +50,20 @@ export const torontoMapConfig: CityMapConfig = {
   initialSelectedSlug: "cohere",
   mapCenter: [-79.3832, 43.6532],
   sourceHref: "https://github.com/taishikato/sf-ai-startup-quest",
-  switchHref: "/ny",
-  switchLabel: "NY",
-  switchAriaLabel: "Open New York AI Startup Map",
+  switchOptions: [
+    {
+      city: "sf",
+      href: "/",
+      label: "SF",
+      ariaLabel: "Open SF AI Startup Map",
+    },
+    {
+      city: "ny",
+      href: "/ny",
+      label: "NY",
+      ariaLabel: "Open New York AI Startup Map",
+    },
+  ],
 }
 
 export const nyMapConfig: CityMapConfig = {
@@ -45,7 +74,18 @@ export const nyMapConfig: CityMapConfig = {
   initialSelectedSlug: "runway",
   mapCenter: [-74.006, 40.7128],
   sourceHref: "https://github.com/taishikato/sf-ai-startup-quest",
-  switchHref: "/",
-  switchLabel: "SF",
-  switchAriaLabel: "Open SF AI Startup Map",
+  switchOptions: [
+    {
+      city: "sf",
+      href: "/",
+      label: "SF",
+      ariaLabel: "Open SF AI Startup Map",
+    },
+    {
+      city: "toronto",
+      href: "/toronto",
+      label: "TO",
+      ariaLabel: "Open Toronto AI Startup Map",
+    },
+  ],
 }

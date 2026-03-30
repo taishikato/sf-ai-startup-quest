@@ -106,10 +106,10 @@ function applyMinecraftStyle(map: MapLibreMap) {
 
   setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a")
   setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
-  ;["park_national_park", "park_nature_reserve"].forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
-    setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
-  })
+    ;["park_national_park", "park_nature_reserve"].forEach((id) => {
+      setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
+      setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
+    })
 
   setPaintPropertyIfLayerExists(
     map,
@@ -977,18 +977,21 @@ export function MapShell({
         >
           <Github className="size-3.5" strokeWidth={2} aria-hidden />
         </a>
-        <a
-          href={config.switchHref}
-          className="flex size-10 items-center justify-center border-[3px] border-[#342414] bg-[#f4ecd2] text-[#4c3926] shadow-[4px_4px_0px_#342414] transition-colors hover:bg-[#e7d8ae]"
-          aria-label={config.switchAriaLabel}
-        >
-          <span
-            className="font-(family-name:--font-pixel) text-[11px] leading-none tracking-tight"
-            aria-hidden
+        {config.switchOptions.map((option) => (
+          <a
+            key={option.city}
+            href={option.href}
+            className="flex size-10 items-center justify-center border-[3px] border-[#342414] bg-[#f4ecd2] text-[#4c3926] shadow-[4px_4px_0px_#342414] transition-colors hover:bg-[#e7d8ae]"
+            aria-label={option.ariaLabel}
           >
-            {config.switchLabel}
-          </span>
-        </a>
+            <span
+              className="font-(family-name:--font-pixel) text-[11px] leading-none tracking-tight"
+              aria-hidden
+            >
+              {option.label}
+            </span>
+          </a>
+        ))}
       </div>
       <style jsx global>{`
         .maplibregl-canvas {
