@@ -16,6 +16,8 @@ import { CompanyCard } from "@/components/company-card"
 type DiscoveryPanelProps = {
   companies: Company[]
   selectedCompany: Company
+  titleLines: [string, string]
+  searchPlaceholder: string
   search: string
   onSearchChange: (value: string) => void
   category: CompanyCategory | "All"
@@ -28,6 +30,8 @@ const FILTER_ALL_COLOR = "#1a1a2e"
 export function DiscoveryPanel({
   companies,
   selectedCompany,
+  titleLines,
+  searchPlaceholder,
   search,
   onSearchChange,
   category,
@@ -67,9 +71,9 @@ export function DiscoveryPanel({
               priority
             />
             <h1 className="font-(family-name:--font-pixel) text-lg leading-relaxed tracking-tight text-[#ffe66d]">
-              SF AI
+              {titleLines[0]}
               <br />
-              Startup Map
+              {titleLines[1]}
             </h1>
           </div>
           <div className="font-(family-name:--font-pixel) text-[8px] text-[#4ecdc4]">
@@ -88,7 +92,7 @@ export function DiscoveryPanel({
             <input
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
-              placeholder="OpenAI, agents, voice..."
+              placeholder={searchPlaceholder}
               className="h-11 w-full border-2 border-[#3a3a5e] bg-[#1a1a2e] pr-4 pl-10 text-sm text-[#f0f7e6] transition-colors outline-none placeholder:text-[#f0f7e6]/30 focus:border-[#4ecdc4]"
             />
           </span>

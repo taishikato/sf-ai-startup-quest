@@ -8,6 +8,7 @@ import maplibregl, {
   type Marker,
 } from "maplibre-gl"
 
+import type { CityMapConfig } from "@/lib/city-config"
 import {
   CATEGORY_COLORS,
   getCompanyLogoUrl,
@@ -21,12 +22,12 @@ import { PixelClouds } from "@/components/pixel-clouds"
 type MapShellProps = {
   companies: Company[]
   selectedCompany: Company
+  config: CityMapConfig
   onSelectCompany: (slug: string) => void
   isAudioMuted: boolean
   onToggleMute: () => void
 }
 
-const SF_CENTER: [number, number] = [-122.4167, 37.7793]
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 // Oblique camera reads closer to isometric / retro city builders.
 const MAP_PITCH = 54
@@ -104,10 +105,10 @@ function applyMinecraftStyle(map: MapLibreMap) {
 
   setPaintPropertyIfLayerExists(map, "landcover", "fill-color", "#7ea64a")
   setPaintPropertyIfLayerExists(map, "landcover", "fill-opacity", 0.96)
-  ;["park_national_park", "park_nature_reserve"].forEach((id) => {
-    setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
-    setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
-  })
+    ;["park_national_park", "park_nature_reserve"].forEach((id) => {
+      setPaintPropertyIfLayerExists(map, id, "fill-color", "#5f9235")
+      setPaintPropertyIfLayerExists(map, id, "fill-opacity", 0.92)
+    })
 
   setPaintPropertyIfLayerExists(
     map,
@@ -767,6 +768,7 @@ function createFallback(monogram: string, active: boolean, dense: boolean) {
 export function MapShell({
   companies,
   selectedCompany,
+  config,
   onSelectCompany,
   isAudioMuted,
   onToggleMute,
@@ -777,6 +779,7 @@ export function MapShell({
   const hasInteractedRef = useRef(false)
   const mapMarkersSignatureRef = useRef("")
   const selectedSlugRef = useRef(selectedCompany.slug)
+  const initialCenterRef = useRef(config.mapCenter)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const dense = companies.length >= 60
 
@@ -793,7 +796,7 @@ export function MapShell({
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: MAP_STYLE,
-      center: SF_CENTER,
+      center: initialCenterRef.current,
       zoom: 11.95,
       pitch: MAP_PITCH,
       bearing: MAP_BEARING,
@@ -964,7 +967,7 @@ export function MapShell({
           )}
         </Button>
         <a
-          href="https://github.com/taishikato/sf-ai-startup-quest"
+          href={config.sourceHref}
           target="_blank"
           rel="noopener noreferrer"
           className="flex size-10 items-center justify-center border-[3px] border-[#342414] bg-[#f4ecd2] text-[#4c3926] shadow-[4px_4px_0px_#342414] transition-colors hover:bg-[#e7d8ae]"
@@ -973,17 +976,15 @@ export function MapShell({
           <Github className="size-3.5" strokeWidth={2} aria-hidden />
         </a>
         <a
-          href="https://toronto-ai-startup-quest.vercel.app"
-          target="_blank"
-          rel="noopener noreferrer"
+          href={config.switchHref}
           className="flex size-10 items-center justify-center border-[3px] border-[#342414] bg-[#f4ecd2] text-[#4c3926] shadow-[4px_4px_0px_#342414] transition-colors hover:bg-[#e7d8ae]"
-          aria-label="Open Toronto AI Startup Quest"
+          aria-label={config.switchAriaLabel}
         >
           <span
             className="font-(family-name:--font-pixel) text-[11px] leading-none tracking-tight"
             aria-hidden
           >
-            TO
+            {config.switchLabel}
           </span>
         </a>
       </div>
