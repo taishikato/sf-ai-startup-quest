@@ -2,20 +2,21 @@
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
 
-import {
-  COMPANIES,
-  YC_BOSS_SLUG,
-  type Company,
-  type CompanyCategory,
-} from "@/lib/companies"
+import type { CityMapConfig } from "@/lib/city-config"
+import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
 
-export function SfAiMap() {
+type CityMapProps = {
+  companies: Company[]
+  config: CityMapConfig
+}
+
+export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
-  const [selectedSlug, setSelectedSlug] = useState("openai")
+  const [selectedSlug, setSelectedSlug] = useState(config.initialSelectedSlug)
   const [isAudioMuted, setIsAudioMuted] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -73,16 +74,13 @@ export function SfAiMap() {
   const filteredCompanies = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase()
 
-    return [...COMPANIES]
+    return [...allCompanies]
       .filter((company) =>
         category === "All" ? true : company.category === category
       )
+      .filter((company) => (query ? true : company.slug !== YC_BOSS_SLUG))
       .filter((company) => {
         if (!query) {
-          if (company.hideFromSidebar) {
-            return false
-          }
-
           return true
         }
 
@@ -91,33 +89,46 @@ export function SfAiMap() {
           company.shortDescription,
           company.category,
           company.locationLabel,
-          company.whyItMatters,
-          company.sourceLabel,
         ]
           .join(" ")
           .toLowerCase()
           .includes(query)
       })
       .sort((left, right) => left.name.localeCompare(right.name))
-  }, [category, deferredSearch])
+  }, [allCompanies, category, deferredSearch])
 
   const selectedCompany =
     filteredCompanies.find((company) => company.slug === selectedSlug) ??
-    COMPANIES.find((company) => company.slug === selectedSlug) ??
+    allCompanies.find((company) => company.slug === selectedSlug) ??
     filteredCompanies[0] ??
-    COMPANIES[0]
+    allCompanies[0]
 
   const mapCompanies = useMemo((): Company[] => {
     const base =
       filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany]
-    const boss = COMPANIES.find((c) => c.slug === YC_BOSS_SLUG)
+    const boss = allCompanies.find((company) => company.slug === YC_BOSS_SLUG)
 
     if (!boss || base.some((c) => c.slug === YC_BOSS_SLUG)) {
       return base
     }
 
     return [...base, boss]
-  }, [filteredCompanies, selectedCompany])
+  }, [allCompanies, filteredCompanies, selectedCompany])
+
+  if (!selectedCompany) {
+    return (
+      <main className="flex h-dvh items-center justify-center bg-[#1a1a2e] px-6 text-center text-[#f0f7e6]">
+        <div>
+          <h1 className="font-(family-name:--font-pixel) text-lg text-[#ffe66d]">
+            {config.emptyStateTitle}
+          </h1>
+          <p className="mt-3 text-sm text-[#f0f7e6]/70">
+            No companies are available yet.
+          </p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="h-dvh overflow-hidden bg-[#1a1a2e]">
@@ -134,6 +145,8 @@ export function SfAiMap() {
             <DiscoveryPanel
               companies={filteredCompanies}
               selectedCompany={selectedCompany}
+              titleLines={config.titleLines}
+              searchPlaceholder={config.searchPlaceholder}
               search={search}
               onSearchChange={setSearch}
               category={category}
@@ -143,8 +156,10 @@ export function SfAiMap() {
           </div>
           <div className="relative h-full min-h-0 overflow-hidden">
             <MapShell
+              key={config.initialSelectedSlug}
               companies={mapCompanies}
               selectedCompany={selectedCompany}
+              config={config}
               onSelectCompany={setSelectedSlug}
               isAudioMuted={isAudioMuted}
               onToggleMute={handleToggleMute}
