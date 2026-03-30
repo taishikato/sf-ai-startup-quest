@@ -938,4 +938,19 @@ export const COMPANIES: Company[] = [
     sourceUrl: "https://circleback.ai",
     sourceLabel: "Circleback website",
   },
+  {
+    slug: "gauge",
+    name: "Gauge",
+    website: "https://withgauge.com",
+    shortDescription:
+      "AI-powered platform that monitors and optimizes brand visibility across generative search engines like ChatGPT, Gemini, and Perplexity.",
+    whyItMatters:
+      "As AI search reshapes how consumers discover brands, Gauge gives marketers the tools to track and improve their presence in this new channel.",
+    category: "Vertical AI",
+    locationLabel: "11 Funston Ave, San Francisco",
+    coordinates: [-122.4723023, 37.7865235],
+    founded: 2024,
+    sourceUrl: "https://withgauge.com",
+    sourceLabel: "Gauge official website",
+  },
 ]
