@@ -874,6 +874,22 @@ export const COMPANIES: Company[] = [
     sourceLabel: "CB Insights company profile",
   },
   {
+    slug: "tusk",
+    name: "Tusk",
+    website: "https://www.usetusk.ai",
+    shortDescription:
+      "AI testing platform that automates unit and integration testing using live traffic",
+    whyItMatters:
+      "Helping top enterprises and startups cover thousands of realistic edge cases in two commands.",
+    category: "Devtools",
+    locationLabel: "1885 Mission St, San Francisco",
+    coordinates: [-122.419655, 37.766922],
+    founded: 2024,
+    sourceUrl:
+      "https://www.usetusk.ai",
+    sourceLabel: "Tusk official website",
+  },
+  {
     slug: YC_BOSS_SLUG,
     name: "Y Combinator",
     website: "https://www.ycombinator.com",
