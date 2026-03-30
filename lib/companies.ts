@@ -921,6 +921,21 @@ export const COMPANIES: Company[] = [
     sourceLabel: "Capy official website",
   },
   {
+    slug: "composite",
+    name: "Composite",
+    website: "https://composite.com",
+    shortDescription:
+      "Browser automation agent that predicts and executes your next action, doing work on your behalf.",
+    whyItMatters:
+      "Democratizing workflow automation by letting anyone automate browser tasks through natural language.",
+    category: "Agents",
+    locationLabel: "425 2nd St, San Francisco",
+    coordinates: [-122.3942, 37.7846],
+    founded: 2024,
+    sourceUrl: "https://composite.com",
+    sourceLabel: "Composite official website",
+  },
+  {
     slug: YC_BOSS_SLUG,
     name: "Y Combinator",
     website: "https://www.ycombinator.com",
