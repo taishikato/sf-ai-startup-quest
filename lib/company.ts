@@ -1,4 +1,5 @@
 import type { Database } from "@/types/supabase"
+import type { CityId } from "@/lib/city-config"
 
 export const COMPANY_CATEGORIES = [
   "Core Labs",
@@ -33,7 +34,7 @@ export type Company = {
   shortDescription: string
   category: CompanyCategory
   locationLabel: string
-  city: "sf" | "toronto" | "ny"
+  city: CityId
   coordinates: [number, number]
   founded: number
   logoUrl?: string

@@ -179,7 +179,7 @@ values
     'default',
     'https://superwhisper.com/careers'
   )
-on conflict (slug) do update
+on conflict (city, slug) do update
 set
   name = excluded.name,
   website = excluded.website,

@@ -620,14 +620,14 @@ values
     'https://modal.com',
     'Serverless cloud platform for running AI and data workloads on GPUs.',
     'Infra',
-    '156 2nd St, San Francisco',
+    '375 Alabama St, San Francisco',
     'sf',
-    37.7871,
-    -122.3975,
+    37.7651442,
+    -122.4143487,
     2021,
     null,
     'default',
-    'https://www.cbinsights.com/company/modal-1'
+    'https://github.com/taishikato/sf-ai-startup-quest/issues/16'
   ),
   (
     'chroma',
@@ -914,7 +914,7 @@ values
     'default',
     'https://withgauge.com'
   )
-on conflict (slug) do update
+on conflict (city, slug) do update
 set
   name = excluded.name,
   website = excluded.website,

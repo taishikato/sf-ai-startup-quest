@@ -1,4 +1,4 @@
-export type CityId = "sf" | "toronto" | "ny"
+export type CityId = "sf" | "toronto" | "ny" | "london"
 
 export type CitySwitchOption = {
   city: CityId
@@ -39,6 +39,12 @@ export const sfMapConfig: CityMapConfig = {
       label: "NY",
       ariaLabel: "Open New York AI Startup Map",
     },
+    {
+      city: "london",
+      href: "/london",
+      label: "LDN",
+      ariaLabel: "Open London AI Startup Map",
+    },
   ],
 }
 
@@ -63,6 +69,12 @@ export const torontoMapConfig: CityMapConfig = {
       label: "NY",
       ariaLabel: "Open New York AI Startup Map",
     },
+    {
+      city: "london",
+      href: "/london",
+      label: "LDN",
+      ariaLabel: "Open London AI Startup Map",
+    },
   ],
 }
 
@@ -86,6 +98,42 @@ export const nyMapConfig: CityMapConfig = {
       href: "/toronto",
       label: "TO",
       ariaLabel: "Open Toronto AI Startup Map",
+    },
+    {
+      city: "london",
+      href: "/london",
+      label: "LDN",
+      ariaLabel: "Open London AI Startup Map",
+    },
+  ],
+}
+
+export const londonMapConfig: CityMapConfig = {
+  city: "london",
+  titleLines: ["London AI", "Startup Map"],
+  emptyStateTitle: "London AI Startup Map",
+  searchPlaceholder: "PolyAI, legal, agents...",
+  initialSelectedSlug: "polyai",
+  mapCenter: [-0.1278, 51.5074],
+  sourceHref: "https://github.com/taishikato/sf-ai-startup-quest",
+  switchOptions: [
+    {
+      city: "sf",
+      href: "/",
+      label: "SF",
+      ariaLabel: "Open SF AI Startup Map",
+    },
+    {
+      city: "toronto",
+      href: "/toronto",
+      label: "TO",
+      ariaLabel: "Open Toronto AI Startup Map",
+    },
+    {
+      city: "ny",
+      href: "/ny",
+      label: "NY",
+      ariaLabel: "Open New York AI Startup Map",
     },
   ],
 }

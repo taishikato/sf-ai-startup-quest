@@ -1,4 +1,4 @@
--- Cursor (Anysphere): SF-based AI code editor; idempotent upsert for all envs.
+-- Modal SF office: verified by Modal team (see GitHub issue #16).
 insert into public.companies (
   slug,
   name,
@@ -15,20 +15,19 @@ insert into public.companies (
   source_url
 )
 values (
-  'cursor',
-  'Cursor',
-  'https://cursor.com',
-  'AI-native code editor from Anysphere with agentic coding, '
-    || 'inline LLMs, and tight repo context for day-to-day software work.',
-  'Devtools',
-  '33 New Montgomery St, San Francisco',
+  'modal',
+  'Modal',
+  'https://modal.com',
+  'Serverless cloud platform for running AI and data workloads on GPUs.',
+  'Infra',
+  '375 Alabama St, San Francisco',
   'sf',
-  37.7886,
-  -122.4013,
-  2022,
+  37.7651442,
+  -122.4143487,
+  2021,
   null,
   'default',
-  'https://en.wikipedia.org/wiki/Anysphere'
+  'https://github.com/taishikato/sf-ai-startup-quest/issues/16'
 )
 on conflict (city, slug) do update set
   name = excluded.name,
@@ -36,7 +35,6 @@ on conflict (city, slug) do update set
   short_description = excluded.short_description,
   category = excluded.category,
   location_label = excluded.location_label,
-  city = excluded.city,
   latitude = excluded.latitude,
   longitude = excluded.longitude,
   founded = excluded.founded,
