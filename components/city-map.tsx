@@ -1,6 +1,14 @@
 "use client"
 
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react"
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import { usePathname, useSearchParams } from "next/navigation"
 
 import type { CityMapConfig } from "@/lib/city-config"
 import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
@@ -14,13 +22,23 @@ type CityMapProps = {
 }
 
 export function CityMap({ companies: allCompanies, config }: CityMapProps) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<CompanyCategory | "All">("All")
-  const [selectedSlug, setSelectedSlug] = useState(config.initialSelectedSlug)
   const [isAudioMuted, setIsAudioMuted] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const deferredSearch = useDeferredValue(search)
+  const selectedSlug = useMemo(
+    () =>
+      resolveSelectedSlug(
+        allCompanies,
+        searchParams.get("c"),
+        config.initialSelectedSlug
+      ),
+    [allCompanies, config.initialSelectedSlug, searchParams]
+  )
 
   useEffect(() => {
     const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3")
@@ -70,6 +88,32 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
       }
     }
   }
+
+  const updateSelectedSlugInUrl = useCallback(
+    (slug: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+
+      params.set("c", slug)
+
+      const nextQuery = params.toString()
+      const currentQuery = searchParams.toString()
+
+      if (nextQuery === currentQuery) {
+        return
+      }
+
+      const hash =
+        typeof window === "undefined" ? "" : window.location.hash
+      const nextUrl = nextQuery ? `${pathname}?${nextQuery}${hash}` : pathname
+
+      window.history.replaceState(null, "", nextUrl)
+    },
+    [pathname, searchParams]
+  )
+
+  useEffect(() => {
+    updateSelectedSlugInUrl(selectedSlug)
+  }, [selectedSlug, updateSelectedSlugInUrl])
 
   const filteredCompanies = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase()
@@ -151,7 +195,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
               onSearchChange={setSearch}
               category={category}
               onCategoryChange={setCategory}
-              onSelectCompany={setSelectedSlug}
+              onSelectCompany={updateSelectedSlugInUrl}
             />
           </div>
           <div className="relative h-full min-h-0 overflow-hidden">
@@ -160,7 +204,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
               companies={mapCompanies}
               selectedCompany={selectedCompany}
               config={config}
-              onSelectCompany={setSelectedSlug}
+              onSelectCompany={updateSelectedSlugInUrl}
               isAudioMuted={isAudioMuted}
               onToggleMute={handleToggleMute}
             />
@@ -169,4 +213,16 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
       </section>
     </main>
   )
+}
+
+function resolveSelectedSlug(
+  companies: Company[],
+  slugFromQuery: string | null,
+  fallbackSlug: string
+) {
+  if (slugFromQuery && companies.some((company) => company.slug === slugFromQuery)) {
+    return slugFromQuery
+  }
+
+  return fallbackSlug
 }
