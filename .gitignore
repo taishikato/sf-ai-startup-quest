@@ -41,6 +41,7 @@ supabase/.temp/
 
 # codex
 .codex/
+.cursor/
 
 # other
 context/
