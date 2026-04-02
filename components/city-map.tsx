@@ -15,6 +15,7 @@ import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
+import { SelectedCompanyPanel } from "@/components/selected-company-panel"
 
 type CityMapProps = {
   companies: Company[]
@@ -180,7 +181,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
           className={cn(
             "grid h-full min-h-0",
             "max-lg:grid-rows-[minmax(0,1fr)_minmax(260px,min(52vh,50dvh))]",
-            "lg:grid-cols-[380px_minmax(0,1fr)]",
+            "lg:grid-cols-[380px_360px_minmax(0,1fr)]",
             "lg:grid-rows-1"
           )}
         >
@@ -197,6 +198,7 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
               onSelectCompany={updateSelectedSlugInUrl}
             />
           </div>
+          <SelectedCompanyPanel company={selectedCompany} />
           <div className="relative h-full min-h-0 overflow-hidden">
             <MapShell
               key={config.initialSelectedSlug}

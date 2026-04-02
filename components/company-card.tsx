@@ -1,16 +1,13 @@
 "use client"
 
-import { useState } from "react"
 import { ArrowUpRight, MapPin } from "lucide-react"
 
-import {
-  CATEGORY_COLORS,
-  categoryPillForeground,
-  getCompanyLogoUrl,
-  getCompanyMonogram,
-  type Company,
-} from "@/lib/company"
+import { type Company } from "@/lib/company"
 import { cn } from "@/lib/utils"
+import {
+  CompanyCategoryTag,
+  CompanyLogoBadge,
+} from "@/components/company-identity"
 
 type CompanyCardProps = {
   company: Company
@@ -25,9 +22,6 @@ export function CompanyCard({
   compact = false,
   onSelect,
 }: CompanyCardProps) {
-  const monogram = getCompanyMonogram(company)
-  const categoryColor = CATEGORY_COLORS[company.category]
-
   const compactBody = (
     <article
       className={cn(
@@ -38,20 +32,12 @@ export function CompanyCard({
       )}
     >
       <div className="flex items-start gap-3">
-        <CompanyLogo company={company} monogram={monogram} compact />
+        <CompanyLogoBadge company={company} compact />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span
-                  className="border px-1.5 py-0.5 text-[8px] font-bold"
-                  style={{
-                    borderColor: categoryColor,
-                    color: categoryColor,
-                  }}
-                >
-                  {company.category}
-                </span>
+                <CompanyCategoryTag company={company} compact />
                 {company.mapSprite === "boss" ? (
                   <span className="text-[8px] font-bold text-[#f26522]">
                     BOSS
@@ -101,22 +87,13 @@ export function CompanyCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span
-              className="border-2 px-2 py-1 text-[8px] font-bold"
-              style={{
-                borderColor: categoryColor,
-                backgroundColor: categoryColor,
-                color: categoryPillForeground(company.category),
-              }}
-            >
-              {company.category}
-            </span>
+            <CompanyCategoryTag company={company} filled />
             {company.mapSprite === "boss" ? (
               <span className="text-[10px] font-bold text-[#f26522]">BOSS</span>
             ) : null}
           </div>
           <div className="mt-3 flex items-center gap-3">
-            <CompanyLogo company={company} monogram={monogram} />
+            <CompanyLogoBadge company={company} />
             <h3 className="min-w-0 text-lg font-bold text-[#f0f7e6]">
               {company.name}
             </h3>
@@ -175,46 +152,6 @@ export function CompanyCard({
       className="w-full text-left outline-none"
     >
       {cardBody}
-    </div>
-  )
-}
-
-function CompanyLogo({
-  company,
-  monogram,
-  compact = false,
-}: {
-  company: Company
-  monogram: string
-  compact?: boolean
-}) {
-  const [showFallback, setShowFallback] = useState(false)
-  const categoryColor = CATEGORY_COLORS[company.category]
-
-  return (
-    <div
-      className={cn(
-        "flex shrink-0 items-center justify-center border-2 bg-[#fffbe6]",
-        compact ? "size-9" : "size-10"
-      )}
-      style={{ borderColor: categoryColor }}
-    >
-      {showFallback ? (
-        <span
-          className={cn("font-bold", compact ? "text-xs" : "text-sm")}
-          style={{ color: categoryColor }}
-        >
-          {monogram}
-        </span>
-      ) : (
-        <img
-          src={getCompanyLogoUrl(company)}
-          alt={`${company.name} logo`}
-          className={cn("object-contain", compact ? "size-5" : "size-6")}
-          loading="lazy"
-          onError={() => setShowFallback(true)}
-        />
-      )}
     </div>
   )
 }
