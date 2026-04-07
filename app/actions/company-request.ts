@@ -28,6 +28,7 @@ const VALID_CITIES = new Set<City>([
   "ny",
   "london",
   "vancouver",
+  "tokyo",
 ])
 const VALID_CATEGORIES = new Set<string>(COMPANY_CATEGORIES)
 

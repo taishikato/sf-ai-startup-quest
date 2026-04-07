@@ -19,6 +19,7 @@ const CITY_OPTIONS = [
   { value: "ny", label: "New York" },
   { value: "london", label: "London" },
   { value: "vancouver", label: "Vancouver" },
+  { value: "tokyo", label: "Tokyo" },
 ] as const
 
 export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
