@@ -10,41 +10,60 @@ import {
   type Company,
   type CompanyCategory,
 } from "@/lib/company"
+import type { DiscoveryMode, Meetup } from "@/lib/meetup"
 import { cn } from "@/lib/utils"
 import { CompanyCard } from "@/components/company-card"
+import { MeetupCard } from "@/components/meetup-card"
 
 type DiscoveryPanelProps = {
+  mode: DiscoveryMode
+  onModeChange: (mode: DiscoveryMode) => void
   companies: Company[]
+  meetups: Meetup[]
   selectedCompany: Company
+  selectedMeetup: Meetup | null
   titleLines: [string, string]
   searchPlaceholder: string
+  meetupSearchPlaceholder: string
+  timeZone: string
   search: string
   onSearchChange: (value: string) => void
   category: CompanyCategory | "All"
   onCategoryChange: (value: CompanyCategory | "All") => void
   onSelectCompany: (slug: string) => void
+  onSelectMeetup: (slug: string) => void
 }
 
 const FILTER_ALL_COLOR = "#1a1a2e"
 
 export function DiscoveryPanel({
+  mode,
+  onModeChange,
   companies,
+  meetups,
   selectedCompany,
+  selectedMeetup,
   titleLines,
   searchPlaceholder,
+  meetupSearchPlaceholder,
+  timeZone,
   search,
   onSearchChange,
   category,
   onCategoryChange,
   onSelectCompany,
+  onSelectMeetup,
 }: DiscoveryPanelProps) {
   const activeItemRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const activeItem = activeItemRef.current
-    const isSelectedVisible = companies.some(
-      (company) => company.slug === selectedCompany.slug
-    )
+    const slug =
+      mode === "startups" ? selectedCompany.slug : selectedMeetup?.slug ?? ""
+    const isSelectedVisible =
+      mode === "startups"
+        ? companies.some((company) => company.slug === slug)
+        : meetups.some((m) => m.slug === slug)
 
     if (!activeItem || !isSelectedVisible) {
       return
@@ -55,7 +74,12 @@ export function DiscoveryPanel({
       block: "nearest",
       inline: "nearest",
     })
-  }, [companies, selectedCompany.slug])
+  }, [companies, meetups, mode, selectedCompany.slug, selectedMeetup?.slug])
+
+  const boardCount =
+    mode === "startups" ? companies.length : meetups.length
+  const boardLabel =
+    mode === "startups" ? "players on the board" : "upcoming meetups"
 
   return (
     <aside className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto border-r-3 border-[#1a1a2e] bg-[#1a1a2e] p-5 text-[#f0f7e6]">
@@ -77,8 +101,35 @@ export function DiscoveryPanel({
             </h1>
           </div>
           <div className="font-(family-name:--font-pixel) text-[8px] text-[#4ecdc4]">
-            {companies.length} players on the board
+            {boardCount} {boardLabel}
           </div>
+        </div>
+
+        <div className="flex gap-2 border-2 border-[#3a3a5e] bg-[#2a2a4e] p-2">
+          <button
+            type="button"
+            onClick={() => onModeChange("startups")}
+            className={cn(
+              "flex-1 border-2 px-3 py-2 font-(family-name:--font-pixel) text-[9px] tracking-wide uppercase transition-colors",
+              mode === "startups"
+                ? "border-[#1a1a2e] bg-[#ffe66d] text-[#1a1a2e] shadow-[2px_2px_0px_#1a1a2e]"
+                : "border-transparent bg-transparent text-[#f0f7e6]/70 hover:text-[#f0f7e6]"
+            )}
+          >
+            Startups
+          </button>
+          <button
+            type="button"
+            onClick={() => onModeChange("meetups")}
+            className={cn(
+              "flex-1 border-2 px-3 py-2 font-(family-name:--font-pixel) text-[9px] tracking-wide uppercase transition-colors",
+              mode === "meetups"
+                ? "border-[#1a1a2e] bg-[#ffe66d] text-[#1a1a2e] shadow-[2px_2px_0px_#1a1a2e]"
+                : "border-transparent bg-transparent text-[#f0f7e6]/70 hover:text-[#f0f7e6]"
+            )}
+          >
+            Meetups
+          </button>
         </div>
       </div>
 
@@ -92,43 +143,47 @@ export function DiscoveryPanel({
             <input
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
-              placeholder={searchPlaceholder}
+              placeholder={
+                mode === "startups" ? searchPlaceholder : meetupSearchPlaceholder
+              }
               className="h-11 w-full border-2 border-[#3a3a5e] bg-[#1a1a2e] pr-4 pl-10 text-sm text-[#f0f7e6] transition-colors outline-none placeholder:text-[#f0f7e6]/30 focus:border-[#4ecdc4]"
             />
           </span>
         </label>
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="font-(family-name:--font-pixel) text-[8px] text-[#ffe66d]">
-              Category
-            </span>
-            <button
-              type="button"
-              onClick={() => onCategoryChange("All")}
-              className="font-(family-name:--font-pixel) text-[7px] text-[#ff6b6b] hover:text-[#ff6b6b]/80"
-            >
-              Reset
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <FilterPill
-              active={category === "All"}
-              label="All"
-              color={FILTER_ALL_COLOR}
-              onClick={() => onCategoryChange("All")}
-            />
-            {COMPANY_CATEGORIES.map((item) => (
+        {mode === "startups" ? (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-(family-name:--font-pixel) text-[8px] text-[#ffe66d]">
+                Category
+              </span>
+              <button
+                type="button"
+                onClick={() => onCategoryChange("All")}
+                className="font-(family-name:--font-pixel) text-[7px] text-[#ff6b6b] hover:text-[#ff6b6b]/80"
+              >
+                Reset
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
               <FilterPill
-                key={item}
-                active={category === item}
-                label={item}
-                color={CATEGORY_COLORS[item]}
-                onClick={() => onCategoryChange(item)}
+                active={category === "All"}
+                label="All"
+                color={FILTER_ALL_COLOR}
+                onClick={() => onCategoryChange("All")}
               />
-            ))}
+              {COMPANY_CATEGORIES.map((item) => (
+                <FilterPill
+                  key={item}
+                  active={category === item}
+                  label={item}
+                  color={CATEGORY_COLORS[item]}
+                  onClick={() => onCategoryChange(item)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
 
       <section className="space-y-3">
@@ -140,20 +195,50 @@ export function DiscoveryPanel({
             Tap to select
           </span>
         </div>
-        {companies.length > 0 ? (
+        {mode === "startups" ? (
+          companies.length > 0 ? (
+            <div className="grid gap-3 pr-1">
+              {companies.map((company) => (
+                <div
+                  key={company.slug}
+                  ref={
+                    company.slug === selectedCompany.slug ? activeItemRef : null
+                  }
+                >
+                  <CompanyCard
+                    company={company}
+                    compact
+                    active={company.slug === selectedCompany.slug}
+                    onSelect={onSelectCompany}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-[#3a3a5e] bg-[#2a2a4e] p-6">
+              <h3 className="font-(family-name:--font-pixel) text-[9px] text-[#ff6b6b]">
+                No match found!
+              </h3>
+              <p className="mt-2 text-xs leading-5 text-[#f0f7e6]/70">
+                Clear the search or switch to All to broaden the view.
+              </p>
+            </div>
+          )
+        ) : meetups.length > 0 ? (
           <div className="grid gap-3 pr-1">
-            {companies.map((company) => (
+            {meetups.map((meetup) => (
               <div
-                key={company.slug}
+                key={meetup.slug}
                 ref={
-                  company.slug === selectedCompany.slug ? activeItemRef : null
+                  meetup.slug === selectedMeetup?.slug ? activeItemRef : null
                 }
               >
-                <CompanyCard
-                  company={company}
+                <MeetupCard
+                  meetup={meetup}
+                  timeZone={timeZone}
                   compact
-                  active={company.slug === selectedCompany.slug}
-                  onSelect={onSelectCompany}
+                  active={meetup.slug === selectedMeetup?.slug}
+                  onSelect={onSelectMeetup}
                 />
               </div>
             ))}
@@ -161,10 +246,11 @@ export function DiscoveryPanel({
         ) : (
           <div className="border-2 border-dashed border-[#3a3a5e] bg-[#2a2a4e] p-6">
             <h3 className="font-(family-name:--font-pixel) text-[9px] text-[#ff6b6b]">
-              No match found!
+              No upcoming meetups
             </h3>
             <p className="mt-2 text-xs leading-5 text-[#f0f7e6]/70">
-              Clear the search or switch to All to broaden the view.
+              Be the first to post a meetup for this city. Use Add meetup on
+              the map.
             </p>
           </div>
         )}
@@ -174,7 +260,13 @@ export function DiscoveryPanel({
         <h2 className="font-(family-name:--font-pixel) text-[8px] text-[#4ecdc4]">
           Selected
         </h2>
-        <CompanyCard company={selectedCompany} active />
+        {mode === "startups" ? (
+          <CompanyCard company={selectedCompany} active />
+        ) : selectedMeetup ? (
+          <MeetupCard meetup={selectedMeetup} timeZone={timeZone} active />
+        ) : (
+          <p className="text-xs text-[#f0f7e6]/60">Nothing selected</p>
+        )}
       </section>
     </aside>
   )

@@ -119,6 +119,90 @@ export type Database = {
         }
         Relationships: []
       }
+      meetups: {
+        Row: {
+          city: string
+          contact_email: string | null
+          created_at: string
+          description: string
+          ends_at: string | null
+          event_url: string
+          id: number
+          latitude: number
+          location_label: string
+          longitude: number
+          organizer_name: string
+          payload_hash: string | null
+          slug: string
+          starts_at: string
+          status: string
+          title: string
+          updated_at: string
+          venue_name: string
+        }
+        Insert: {
+          city: string
+          contact_email?: string | null
+          created_at?: string
+          description: string
+          ends_at?: string | null
+          event_url: string
+          id?: never
+          latitude: number
+          location_label: string
+          longitude: number
+          organizer_name: string
+          payload_hash?: string | null
+          slug: string
+          starts_at: string
+          status?: string
+          title: string
+          updated_at?: string
+          venue_name: string
+        }
+        Update: {
+          city?: string
+          contact_email?: string | null
+          created_at?: string
+          description?: string
+          ends_at?: string | null
+          event_url?: string
+          id?: never
+          latitude?: number
+          location_label?: string
+          longitude?: number
+          organizer_name?: string
+          payload_hash?: string | null
+          slug?: string
+          starts_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          venue_name?: string
+        }
+        Relationships: []
+      }
+      meetup_submission_attempts: {
+        Row: {
+          created_at: string
+          id: number
+          ip_hash: string
+          payload_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          ip_hash: string
+          payload_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          ip_hash?: string
+          payload_hash?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

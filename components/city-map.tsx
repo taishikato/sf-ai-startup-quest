@@ -13,19 +13,26 @@ import { usePathname, useSearchParams } from "next/navigation"
 
 import type { CityMapConfig } from "@/lib/city-config"
 import { YC_BOSS_SLUG, type Company, type CompanyCategory } from "@/lib/company"
+import type { DiscoveryMode, Meetup } from "@/lib/meetup"
 import { cn } from "@/lib/utils"
 import { DiscoveryPanel } from "@/components/discovery-panel"
 import { MapShell } from "@/components/map-shell"
 import { SelectedCompanyPanel } from "@/components/selected-company-panel"
+import { SelectedMeetupPanel } from "@/components/selected-meetup-panel"
 
 type CityMapProps = {
   companies: Company[]
+  meetups: Meetup[]
   config: CityMapConfig
 }
 
 const SELECTED_PANEL_STORAGE_EVENT = "selected-company-panel-storage"
 
-export function CityMap({ companies: allCompanies, config }: CityMapProps) {
+export function CityMap({
+  companies: allCompanies,
+  meetups: allMeetups,
+  config,
+}: CityMapProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [search, setSearch] = useState("")
@@ -44,6 +51,11 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const deferredSearch = useDeferredValue(search)
+
+  const mode = useMemo((): DiscoveryMode => {
+    return searchParams.get("mode") === "meetups" ? "meetups" : "startups"
+  }, [searchParams])
+
   const selectedSlug = useMemo(
     () =>
       resolveSelectedSlug(
@@ -53,6 +65,110 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
       ),
     [allCompanies, config.initialSelectedSlug, searchParams]
   )
+
+  const filteredCompanies = useMemo(() => {
+    const query = deferredSearch.trim().toLowerCase()
+
+    return [...allCompanies]
+      .filter((company) =>
+        category === "All" ? true : company.category === category
+      )
+      .filter((company) => (query ? true : company.slug !== YC_BOSS_SLUG))
+      .filter((company) => {
+        if (!query) {
+          return true
+        }
+
+        return [
+          company.name,
+          company.shortDescription,
+          company.category,
+          company.locationLabel,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(query)
+      })
+      .sort((left, right) => left.name.localeCompare(right.name))
+  }, [allCompanies, category, deferredSearch])
+
+  const filteredMeetups = useMemo(() => {
+    const query = deferredSearch.trim().toLowerCase()
+    return [...allMeetups]
+      .filter((meetup) => {
+        if (!query) {
+          return true
+        }
+
+        return [
+          meetup.title,
+          meetup.description,
+          meetup.venueName,
+          meetup.locationLabel,
+          meetup.organizerName,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(query)
+      })
+      .sort((a, b) => {
+        const t =
+          new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
+        if (t !== 0) {
+          return t
+        }
+        return a.title.localeCompare(b.title)
+      })
+  }, [allMeetups, deferredSearch])
+
+  const selectedMeetupSlug = useMemo(
+    () =>
+      resolveSelectedMeetupSlug(
+        allMeetups,
+        searchParams.get("m"),
+        filteredMeetups[0]?.slug ?? null
+      ),
+    [allMeetups, filteredMeetups, searchParams]
+  )
+
+  const selectedCompany =
+    filteredCompanies.find((company) => company.slug === selectedSlug) ??
+    allCompanies.find((company) => company.slug === selectedSlug) ??
+    filteredCompanies[0] ??
+    allCompanies[0]
+
+  const selectedMeetup = useMemo(() => {
+    if (!selectedMeetupSlug) {
+      return null
+    }
+    return (
+      allMeetups.find((m) => m.slug === selectedMeetupSlug) ??
+      filteredMeetups.find((m) => m.slug === selectedMeetupSlug) ??
+      null
+    )
+  }, [allMeetups, filteredMeetups, selectedMeetupSlug])
+
+  const mapCompanies = useMemo((): Company[] => {
+    const base =
+      filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany]
+    const boss = allCompanies.find((company) => company.slug === YC_BOSS_SLUG)
+
+    if (!boss || base.some((c) => c.slug === YC_BOSS_SLUG)) {
+      return base
+    }
+
+    return [...base, boss]
+  }, [allCompanies, filteredCompanies, selectedCompany])
+
+  const mapMeetups = useMemo((): Meetup[] => {
+    if (filteredMeetups.length > 0) {
+      return filteredMeetups
+    }
+    if (selectedMeetup) {
+      return [selectedMeetup]
+    }
+    return []
+  }, [filteredMeetups, selectedMeetup])
 
   useEffect(() => {
     const audio = new Audio("/audio/sf-ai-startup-map-theme.mp3")
@@ -117,74 +233,103 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
     }
   }
 
-  const updateSelectedSlugInUrl = useCallback(
-    (slug: string) => {
-      const params = new URLSearchParams(searchParams.toString())
+  const syncSelectionToUrl = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString())
+    const hash = typeof window === "undefined" ? "" : window.location.hash
 
-      params.set("c", slug)
+    if (mode === "startups") {
+      params.delete("mode")
+      params.delete("m")
+      if (selectedCompany) {
+        params.set("c", selectedCompany.slug)
+      }
+    } else {
+      params.set("mode", "meetups")
+      params.delete("c")
+      if (selectedMeetupSlug) {
+        params.set("m", selectedMeetupSlug)
+      } else {
+        params.delete("m")
+      }
+    }
 
-      const nextQuery = params.toString()
-      const currentQuery = searchParams.toString()
+    const nextQuery = params.toString()
+    const currentQuery = searchParams.toString()
 
-      if (nextQuery === currentQuery) {
+    if (nextQuery === currentQuery) {
+      return
+    }
+
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}${hash}` : pathname
+
+    window.history.replaceState(null, "", nextUrl)
+  }, [
+    mode,
+    pathname,
+    searchParams,
+    selectedCompany,
+    selectedMeetupSlug,
+  ])
+
+  useEffect(() => {
+    syncSelectionToUrl()
+  }, [syncSelectionToUrl])
+
+  const handleModeChange = useCallback(
+    (next: DiscoveryMode) => {
+      setSearch("")
+      if (typeof window === "undefined") {
         return
       }
 
-      const hash = typeof window === "undefined" ? "" : window.location.hash
-      const nextUrl = nextQuery ? `${pathname}?${nextQuery}${hash}` : pathname
+      const params = new URLSearchParams(searchParams.toString())
+      const hash = window.location.hash
+
+      if (next === "startups") {
+        params.delete("mode")
+        params.delete("m")
+      } else {
+        params.set("mode", "meetups")
+        params.delete("c")
+      }
+
+      const nextQuery = params.toString()
+      const nextUrl = nextQuery
+        ? `${pathname}?${nextQuery}${hash}`
+        : `${pathname}${hash}`
 
       window.history.replaceState(null, "", nextUrl)
     },
     [pathname, searchParams]
   )
 
-  useEffect(() => {
-    updateSelectedSlugInUrl(selectedSlug)
-  }, [selectedSlug, updateSelectedSlugInUrl])
+  const updateCompanySlugInUrl = useCallback(
+    (slug: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      const hash = typeof window === "undefined" ? "" : window.location.hash
+      params.set("c", slug)
+      params.delete("m")
+      params.delete("mode")
+      const nextQuery = params.toString()
+      const nextUrl = nextQuery ? `${pathname}?${nextQuery}${hash}` : pathname
+      window.history.replaceState(null, "", nextUrl)
+    },
+    [pathname, searchParams]
+  )
 
-  const filteredCompanies = useMemo(() => {
-    const query = deferredSearch.trim().toLowerCase()
-
-    return [...allCompanies]
-      .filter((company) =>
-        category === "All" ? true : company.category === category
-      )
-      .filter((company) => (query ? true : company.slug !== YC_BOSS_SLUG))
-      .filter((company) => {
-        if (!query) {
-          return true
-        }
-
-        return [
-          company.name,
-          company.shortDescription,
-          company.category,
-          company.locationLabel,
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(query)
-      })
-      .sort((left, right) => left.name.localeCompare(right.name))
-  }, [allCompanies, category, deferredSearch])
-
-  const selectedCompany =
-    filteredCompanies.find((company) => company.slug === selectedSlug) ??
-    allCompanies.find((company) => company.slug === selectedSlug) ??
-    filteredCompanies[0] ??
-    allCompanies[0]
-
-  const mapCompanies = useMemo((): Company[] => {
-    const base =
-      filteredCompanies.length > 0 ? filteredCompanies : [selectedCompany]
-    const boss = allCompanies.find((company) => company.slug === YC_BOSS_SLUG)
-
-    if (!boss || base.some((c) => c.slug === YC_BOSS_SLUG)) {
-      return base
-    }
-
-    return [...base, boss]
-  }, [allCompanies, filteredCompanies, selectedCompany])
+  const updateMeetupSlugInUrl = useCallback(
+    (slug: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      const hash = typeof window === "undefined" ? "" : window.location.hash
+      params.set("mode", "meetups")
+      params.set("m", slug)
+      params.delete("c")
+      const nextQuery = params.toString()
+      const nextUrl = nextQuery ? `${pathname}?${nextQuery}${hash}` : pathname
+      window.history.replaceState(null, "", nextUrl)
+    },
+    [pathname, searchParams]
+  )
 
   if (!selectedCompany) {
     return (
@@ -216,29 +361,49 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
         >
           <div className="flex h-full min-h-0 flex-col overflow-hidden">
             <DiscoveryPanel
+              mode={mode}
+              onModeChange={handleModeChange}
               companies={filteredCompanies}
+              meetups={filteredMeetups}
               selectedCompany={selectedCompany}
+              selectedMeetup={selectedMeetup}
               titleLines={config.titleLines}
               searchPlaceholder={config.searchPlaceholder}
+              meetupSearchPlaceholder={config.meetupSearchPlaceholder}
+              timeZone={config.timezone}
               search={search}
               onSearchChange={setSearch}
               category={category}
               onCategoryChange={setCategory}
-              onSelectCompany={updateSelectedSlugInUrl}
+              onSelectCompany={updateCompanySlugInUrl}
+              onSelectMeetup={updateMeetupSlugInUrl}
             />
           </div>
-          <SelectedCompanyPanel
-            company={selectedCompany}
-            collapsed={isSelectedPanelCollapsed}
-            onToggleCollapsed={handleToggleSelectedPanel}
-          />
+          {mode === "startups" ? (
+            <SelectedCompanyPanel
+              company={selectedCompany}
+              collapsed={isSelectedPanelCollapsed}
+              onToggleCollapsed={handleToggleSelectedPanel}
+            />
+          ) : (
+            <SelectedMeetupPanel
+              meetup={selectedMeetup}
+              timeZone={config.timezone}
+              collapsed={isSelectedPanelCollapsed}
+              onToggleCollapsed={handleToggleSelectedPanel}
+            />
+          )}
           <div className="relative h-full min-h-0 overflow-hidden">
             <MapShell
-              key={config.initialSelectedSlug}
+              key={`${config.city}-${mode}`}
+              mode={mode}
               companies={mapCompanies}
+              meetups={mapMeetups}
               selectedCompany={selectedCompany}
+              selectedMeetup={selectedMeetup}
               config={config}
-              onSelectCompany={updateSelectedSlugInUrl}
+              onSelectCompany={updateCompanySlugInUrl}
+              onSelectMeetup={updateMeetupSlugInUrl}
               isAudioMuted={isAudioMuted}
               onToggleMute={handleToggleMute}
             />
@@ -258,6 +423,18 @@ function resolveSelectedSlug(
     slugFromQuery &&
     companies.some((company) => company.slug === slugFromQuery)
   ) {
+    return slugFromQuery
+  }
+
+  return fallbackSlug
+}
+
+function resolveSelectedMeetupSlug(
+  allMeetups: Meetup[],
+  slugFromQuery: string | null,
+  fallbackSlug: string | null
+) {
+  if (slugFromQuery && allMeetups.some((m) => m.slug === slugFromQuery)) {
     return slugFromQuery
   }
 

@@ -18,15 +18,29 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { CompanyRequestPanel } from "@/components/company-request-panel"
+import { MeetupRequestPanel } from "@/components/meetup-request-panel"
 import { PixelClouds } from "@/components/pixel-clouds"
+import type { Meetup } from "@/lib/meetup"
+import type { DiscoveryMode } from "@/lib/meetup"
 
 type MapShellProps = {
+  mode: DiscoveryMode
   companies: Company[]
+  meetups: Meetup[]
   selectedCompany: Company
+  selectedMeetup: Meetup | null
   config: CityMapConfig
   onSelectCompany: (slug: string) => void
+  onSelectMeetup: (slug: string) => void
   isAudioMuted: boolean
   onToggleMute: () => void
+}
+
+function cityHrefWithMode(baseHref: string, mapMode: DiscoveryMode) {
+  if (mapMode === "meetups") {
+    return baseHref === "/" ? "/?mode=meetups" : `${baseHref}?mode=meetups`
+  }
+  return baseHref
 }
 
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
@@ -298,7 +312,11 @@ function getMarkerFloatTiming(slug: string) {
 }
 
 function createFloatingMarkerFrame(company: Company) {
-  const { duration, delay } = getMarkerFloatTiming(company.slug)
+  return createFloatingMarkerFrameFromSlug(company.slug)
+}
+
+function createFloatingMarkerFrameFromSlug(slug: string) {
+  const { duration, delay } = getMarkerFloatTiming(slug)
 
   return sd({
     display: "flex",
@@ -750,6 +768,97 @@ function createMarkerSprite(company: Company, active: boolean, dense: boolean) {
   return createSpriteMarker(company, active, dense)
 }
 
+function createMeetupSignboardMarker(
+  meetup: Meetup,
+  active: boolean,
+  dense: boolean
+) {
+  const OL = "#342414"
+  const wood = active ? "#c17a3a" : "#9d6230"
+  const woodDark = "#5c3a1e"
+  const plank = dense ? (active ? 32 : 28) : active ? 38 : 32
+  const h = dense ? (active ? 40 : 34) : active ? 48 : 40
+
+  const wrapper = sd({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  })
+
+  const float = createFloatingMarkerFrameFromSlug(meetup.slug)
+
+  const posts = sd({
+    display: "flex",
+    flexDirection: "row",
+    gap: `${Math.round(plank * 0.4)}px`,
+    marginBottom: "-4px",
+  })
+  for (let i = 0; i < 2; i++) {
+    posts.appendChild(
+      sd({
+        width: `${Math.round(plank * 0.14)}px`,
+        height: `${Math.round(h * 0.35)}px`,
+        background: woodDark,
+        border: `2px solid ${OL}`,
+      })
+    )
+  }
+  float.appendChild(posts)
+
+  const board = sd({
+    width: `${plank}px`,
+    minHeight: `${h}px`,
+    background: wood,
+    border: `${active ? 3 : 2}px solid ${OL}`,
+    boxShadow: active
+      ? `0 0 0 2px rgba(255,230,109,0.45), 4px 4px 0 ${OL}`
+      : `4px 4px 0 ${OL}`,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "6px 4px",
+    position: "relative",
+  })
+
+  board.appendChild(
+    sd({
+      position: "absolute",
+      top: "4px",
+      width: "6px",
+      height: "6px",
+      background: "#5a5a5a",
+      border: `1px solid ${OL}`,
+    })
+  )
+
+  const bang = document.createElement("span")
+  bang.textContent = "!"
+  Object.assign(bang.style, {
+    fontSize: dense ? "15px" : "17px",
+    fontWeight: "900",
+    color: OL,
+    lineHeight: "1",
+    marginTop: "6px",
+    fontFamily: "ui-sans-serif, system-ui, sans-serif",
+  })
+  board.appendChild(bang)
+
+  float.appendChild(board)
+  wrapper.appendChild(float)
+
+  wrapper.appendChild(
+    sd({
+      width: `${Math.round(plank * 0.9)}px`,
+      height: "6px",
+      background: "rgba(52,36,20,0.35)",
+      marginTop: "2px",
+    })
+  )
+
+  return wrapper
+}
+
 function createFallback(monogram: string, active: boolean, dense: boolean) {
   const el = document.createElement("span")
   el.textContent = monogram
@@ -767,10 +876,14 @@ function createFallback(monogram: string, active: boolean, dense: boolean) {
 }
 
 export function MapShell({
+  mode,
   companies,
+  meetups,
   selectedCompany,
+  selectedMeetup,
   config,
   onSelectCompany,
+  onSelectMeetup,
   isAudioMuted,
   onToggleMute,
 }: MapShellProps) {
@@ -781,12 +894,17 @@ export function MapShell({
   const mapMarkersSignatureRef = useRef("")
   const selectedSlugRef = useRef(selectedCompany.slug)
   const initialCenterRef = useRef(config.mapCenter)
+  const skipFirstBoundsRefitRef = useRef(true)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
-  const dense = companies.length >= 60
+  const denseStartups = companies.length >= 60
+  const denseMeetups = meetups.length >= 60
 
   useEffect(() => {
-    selectedSlugRef.current = selectedCompany.slug
-  }, [selectedCompany.slug])
+    selectedSlugRef.current =
+      mode === "startups"
+        ? selectedCompany.slug
+        : selectedMeetup?.slug ?? ""
+  }, [mode, selectedCompany.slug, selectedMeetup?.slug])
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) {
@@ -845,70 +963,166 @@ export function MapShell({
     markersRef.current.forEach((marker) => marker.remove())
     markersRef.current.clear()
 
-    companies.forEach((company) => {
-      const active = company.slug === selectedSlugRef.current
-      const element = document.createElement("button")
-      element.type = "button"
-      element.setAttribute("aria-label", company.name)
-      element.style.cursor = "pointer"
-      element.style.padding = "0"
-      element.style.outline = "none"
-      element.style.background = "none"
-      element.style.border = "none"
-      element.appendChild(createMarkerSprite(company, active, dense))
-      element.addEventListener("click", () => onSelectCompany(company.slug))
+    if (mode === "startups") {
+      const dense = denseStartups
+      companies.forEach((company) => {
+        const active = company.slug === selectedSlugRef.current
+        const element = document.createElement("button")
+        element.type = "button"
+        element.setAttribute("aria-label", company.name)
+        element.style.cursor = "pointer"
+        element.style.padding = "0"
+        element.style.outline = "none"
+        element.style.background = "none"
+        element.style.border = "none"
+        element.appendChild(createMarkerSprite(company, active, dense))
+        element.addEventListener("click", () => onSelectCompany(company.slug))
 
-      const marker = new maplibregl.Marker({ element, anchor: "bottom" })
-        .setLngLat(company.coordinates)
-        .addTo(map)
+        const marker = new maplibregl.Marker({ element, anchor: "bottom" })
+          .setLngLat(company.coordinates)
+          .addTo(map)
 
-      markersRef.current.set(company.slug, marker)
-    })
+        markersRef.current.set(company.slug, marker)
+      })
 
-    const markerSetSignature = [...companies]
-      .map((c) => c.slug)
-      .sort()
-      .join("|")
-    const shouldRefit =
-      markerSetSignature !== mapMarkersSignatureRef.current &&
-      companies.length > 0
-    mapMarkersSignatureRef.current = markerSetSignature
+      const markerSetSignature = [...companies]
+        .map((c) => c.slug)
+        .sort()
+        .join("|")
+      const shouldRefit =
+        markerSetSignature !== mapMarkersSignatureRef.current &&
+        companies.length > 0
+      mapMarkersSignatureRef.current = markerSetSignature
 
-    if (shouldRefit) {
-      const bounds = new maplibregl.LngLatBounds()
-      companies.forEach((c) => bounds.extend(c.coordinates))
+      if (shouldRefit) {
+        if (skipFirstBoundsRefitRef.current) {
+          skipFirstBoundsRefitRef.current = false
+        } else {
+          const bounds = new maplibregl.LngLatBounds()
+          companies.forEach((c) => bounds.extend(c.coordinates))
 
-      if (companies.length === 1) {
-        map.jumpTo({
-          center: companies[0].coordinates,
-          zoom: 12.5,
-          pitch: MAP_PITCH,
-          bearing: MAP_BEARING,
-        })
-      } else {
-        map.fitBounds(bounds, {
-          padding: 56,
-          maxZoom: 12.35,
-          duration: 0,
-        })
-        map.setPitch(MAP_PITCH)
-        map.setBearing(MAP_BEARING)
+          if (companies.length === 1) {
+            map.jumpTo({
+              center: companies[0].coordinates,
+              zoom: 12.5,
+              pitch: MAP_PITCH,
+              bearing: MAP_BEARING,
+            })
+          } else {
+            map.fitBounds(bounds, {
+              padding: 56,
+              maxZoom: 12.35,
+              duration: 0,
+            })
+            map.setPitch(MAP_PITCH)
+            map.setBearing(MAP_BEARING)
+          }
+        }
+      }
+    } else {
+      const dense = denseMeetups
+      meetups.forEach((meetup) => {
+        const active = meetup.slug === selectedSlugRef.current
+        const element = document.createElement("button")
+        element.type = "button"
+        element.setAttribute("aria-label", meetup.title)
+        element.style.cursor = "pointer"
+        element.style.padding = "0"
+        element.style.outline = "none"
+        element.style.background = "none"
+        element.style.border = "none"
+        element.appendChild(createMeetupSignboardMarker(meetup, active, dense))
+        element.addEventListener("click", () => onSelectMeetup(meetup.slug))
+
+        const marker = new maplibregl.Marker({ element, anchor: "bottom" })
+          .setLngLat(meetup.coordinates)
+          .addTo(map)
+
+        markersRef.current.set(meetup.slug, marker)
+      })
+
+      const markerSetSignature = [...meetups]
+        .map((m) => m.slug)
+        .sort()
+        .join("|")
+      const shouldRefit =
+        markerSetSignature !== mapMarkersSignatureRef.current &&
+        meetups.length > 0
+      mapMarkersSignatureRef.current = markerSetSignature
+
+      if (shouldRefit) {
+        if (skipFirstBoundsRefitRef.current) {
+          skipFirstBoundsRefitRef.current = false
+        } else {
+          const bounds = new maplibregl.LngLatBounds()
+          meetups.forEach((m) => bounds.extend(m.coordinates))
+
+          if (meetups.length === 1) {
+            map.jumpTo({
+              center: meetups[0].coordinates,
+              zoom: 12.5,
+              pitch: MAP_PITCH,
+              bearing: MAP_BEARING,
+            })
+          } else {
+            map.fitBounds(bounds, {
+              padding: 56,
+              maxZoom: 12.35,
+              duration: 0,
+            })
+            map.setPitch(MAP_PITCH)
+            map.setBearing(MAP_BEARING)
+          }
+        }
       }
     }
-  }, [companies, dense, onSelectCompany])
+  }, [
+    companies,
+    denseMeetups,
+    denseStartups,
+    meetups,
+    mode,
+    onSelectCompany,
+    onSelectMeetup,
+  ])
 
   useEffect(() => {
-    markersRef.current.forEach((marker, slug) => {
-      const button = marker.getElement() as HTMLButtonElement
-      const active = slug === selectedCompany.slug
-      const company = companies.find((item) => item.slug === slug)
+    if (mode === "startups") {
+      const dense = denseStartups
+      markersRef.current.forEach((marker, slug) => {
+        const button = marker.getElement() as HTMLButtonElement
+        const active = slug === selectedCompany.slug
+        const company = companies.find((item) => item.slug === slug)
 
-      button.style.zIndex = active ? "10" : "1"
-      if (company) {
-        button.replaceChildren(createMarkerSprite(company, active, dense))
-      }
-    })
-  }, [companies, dense, selectedCompany])
+        button.style.zIndex = active ? "10" : "1"
+        if (company) {
+          button.replaceChildren(createMarkerSprite(company, active, dense))
+        }
+      })
+    } else {
+      const dense = denseMeetups
+      markersRef.current.forEach((marker, slug) => {
+        const button = marker.getElement() as HTMLButtonElement
+        const active = slug === selectedMeetup?.slug
+        const meetup = meetups.find((item) => item.slug === slug)
+
+        button.style.zIndex = active ? "10" : "1"
+        if (meetup) {
+          button.replaceChildren(
+            createMeetupSignboardMarker(meetup, active, dense)
+          )
+        }
+      })
+    }
+  }, [
+    companies,
+    denseMeetups,
+    denseStartups,
+    meetups,
+    mode,
+    selectedCompany,
+    selectedMeetup,
+  ])
 
   useEffect(() => {
     const map = mapRef.current
@@ -921,8 +1135,17 @@ export function MapShell({
       return
     }
 
+    const nextCenter =
+      mode === "startups"
+        ? selectedCompany.coordinates
+        : selectedMeetup?.coordinates
+
+    if (!nextCenter) {
+      return
+    }
+
     map.flyTo({
-      center: selectedCompany.coordinates,
+      center: nextCenter,
       zoom: 13.05,
       pitch: MAP_PITCH,
       bearing: MAP_BEARING,
@@ -930,7 +1153,7 @@ export function MapShell({
       curve: 1.2,
       essential: true,
     })
-  }, [selectedCompany])
+  }, [mode, selectedCompany, selectedMeetup])
 
   return (
     <div className="relative h-full min-h-0 overflow-hidden bg-[#cdb98b] lg:min-h-160">
@@ -950,7 +1173,11 @@ export function MapShell({
         />
       </div>
       {mapReady && <PixelClouds map={mapReady} />}
-      <CompanyRequestPanel initialCity={config.city} />
+      {mode === "startups" ? (
+        <CompanyRequestPanel initialCity={config.city} />
+      ) : (
+        <MeetupRequestPanel initialCity={config.city} />
+      )}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#fff3cf]/35 to-transparent" />
       <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
         <Button
@@ -980,7 +1207,7 @@ export function MapShell({
         {config.switchOptions.map((option) => (
           <a
             key={option.city}
-            href={option.href}
+            href={cityHrefWithMode(option.href, mode)}
             className="flex size-10 items-center justify-center border-[3px] border-[#342414] bg-[#f4ecd2] text-[#4c3926] shadow-[4px_4px_0px_#342414] transition-colors hover:bg-[#e7d8ae]"
             aria-label={option.ariaLabel}
           >
