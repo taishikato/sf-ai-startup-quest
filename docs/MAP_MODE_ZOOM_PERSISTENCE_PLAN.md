@@ -20,9 +20,16 @@ This plan applies only to the in-city mode switch. City navigation such as
   !== mode`.
 - When mode changes after the initial marker render, suppress the marker-set
   `fitBounds` / `jumpTo` camera reset for that mode-switch render.
+- If the destination mode has no markers yet because data is still loading,
+  carry that suppression to the next non-empty marker-set refit and clear it
+  after that single skip.
 - When skipping that camera reset, still update the marker-set signature for the
   active mode so the skipped `fitBounds` / `jumpTo` does not run on a later
   render.
+- Scope the marker-set signature by mode, for example
+  `startups:<sorted slugs>` and `meetups:<sorted slugs>`.
+- Consume pending first-render and mode-switch refit skips together so a skip
+  cannot leak into an unrelated later marker-set change.
 - After handling a marker-render pass, update `prevModeRef.current` to the
   current `mode`.
 - Use `map.getZoom()` for every selection `flyTo`, including mode-switch
@@ -64,6 +71,9 @@ This plan applies only to the in-city mode switch. City navigation such as
   - Zoom out manually, record `map.getZoom()` as the pre-switch zoom, switch
     `Meetups` to `Startups`, wait for camera movement to settle, and confirm the
     post-switch zoom differs from the pre-switch zoom by no more than `0.1`.
+  - Reload, switch to `Meetups` before or while meetup markers are still empty,
+    wait for the first meetup markers to render, and confirm the zoom remains
+    within `0.1` of the pre-switch zoom with no delayed refit afterward.
   - After switching modes at a manually changed zoom, select a startup or meetup
     and confirm the selected marker is focused while the zoom remains within
     `0.1` of the pre-selection zoom.
