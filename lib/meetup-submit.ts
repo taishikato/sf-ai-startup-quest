@@ -25,8 +25,7 @@ export function hashMeetupPayload(parts: {
   description: string
   venueName: string
   locationLabel: string
-  startsAt: string
-  endsAt: string | null
+  eventDate: string
   organizerName: string | null
   eventUrl: string
   xAccount: string
@@ -42,9 +41,9 @@ export function hashClientIp(ip: string) {
 export function slugifyMeetupBase(
   title: string,
   city: CityId,
-  startsAtIso: string
+  eventDate: string
 ) {
-  const day = startsAtIso.slice(0, 10).replaceAll("-", "")
+  const day = eventDate.replaceAll("-", "")
   const base = title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")

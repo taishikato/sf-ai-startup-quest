@@ -18,8 +18,7 @@ export type MeetupSubmitPayload = {
   description: string
   venueName: string
   locationLabel: string
-  startsAt: string
-  endsAt: string | null
+  eventDate: string
   organizerName: string
   eventUrl: string
   xAccount: string
@@ -53,6 +52,20 @@ function localDateKey(date: Date, timeZone: string) {
     parts.find((part) => part.type === type)?.value ?? ""
 
   return `${valueFor("year")}-${valueFor("month")}-${valueFor("day")}`
+}
+
+function isValidDateOnly(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false
+  }
+
+  const [year, month, day] = value.split("-").map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  )
 }
 
 async function getRequestIp(): Promise<string> {
@@ -183,37 +196,12 @@ export async function submitMeetup(
     return { status: "error", message: "X account is too long." }
   }
 
-  let startsAtMs: number
-  let endsAtMs: number | null = null
-
-  try {
-    startsAtMs = new Date(payload.startsAt).getTime()
-    if (!Number.isFinite(startsAtMs)) {
-      return { status: "error", message: "Start time is invalid." }
-    }
-    if (payload.endsAt) {
-      endsAtMs = new Date(payload.endsAt).getTime()
-      if (!Number.isFinite(endsAtMs)) {
-        return { status: "error", message: "End time is invalid." }
-      }
-      if (endsAtMs <= startsAtMs) {
-        return {
-          status: "error",
-          message: "End time must be after start time.",
-        }
-      }
-    }
-  } catch {
-    return { status: "error", message: "Date and time are invalid." }
+  if (!isValidDateOnly(payload.eventDate)) {
+    return { status: "error", message: "Date is invalid." }
   }
 
-  const now = Date.now()
   const timeZone = CITY_TIMEZONES[payload.city]
-  const upcoming =
-    endsAtMs !== null
-      ? endsAtMs >= now
-      : localDateKey(new Date(startsAtMs), timeZone) >=
-        localDateKey(new Date(now), timeZone)
+  const upcoming = payload.eventDate >= localDateKey(new Date(), timeZone)
 
   if (!upcoming) {
     return {
@@ -240,8 +228,7 @@ export async function submitMeetup(
     description: storedDescription,
     venueName,
     locationLabel,
-    startsAt: payload.startsAt,
-    endsAt: payload.endsAt,
+    eventDate: payload.eventDate,
     organizerName: storedOrganizerName,
     eventUrl,
     xAccount,
@@ -326,7 +313,7 @@ export async function submitMeetup(
     }
   }
 
-  const baseSlug = slugifyMeetupBase(title, payload.city, payload.startsAt)
+  const baseSlug = slugifyMeetupBase(title, payload.city, payload.eventDate)
   let slug = baseSlug
   let insertedSlug: string | null = null
 
@@ -342,8 +329,7 @@ export async function submitMeetup(
         location_label: locationLabel,
         latitude: coords.lat,
         longitude: coords.lng,
-        starts_at: payload.startsAt,
-        ends_at: payload.endsAt || null,
+        event_date: payload.eventDate,
         organizer_name: storedOrganizerName,
         event_url: eventUrl,
         contact_email: xAccount || null,

@@ -10,12 +10,11 @@ import {
 } from "lucide-react"
 
 import type { Meetup } from "@/lib/meetup"
-import { formatMeetupRangeInTimezone } from "@/lib/meetup-datetime"
+import { formatMeetupDate } from "@/lib/meetup-datetime"
 import { cn } from "@/lib/utils"
 
 export type SelectedMeetupPanelProps = {
   meetup: Meetup | null
-  timeZone: string
   meetupsLoading: boolean
   meetupsError: boolean
   collapsed: boolean
@@ -24,7 +23,6 @@ export type SelectedMeetupPanelProps = {
 
 export function SelectedMeetupPanel({
   meetup,
-  timeZone,
   meetupsLoading,
   meetupsError,
   collapsed,
@@ -108,11 +106,7 @@ export function SelectedMeetupPanel({
                   </h2>
                   <p className="mt-3 inline-flex items-center gap-2 text-sm text-[#4ecdc4]">
                     <Calendar className="size-4 shrink-0" />
-                    {formatMeetupRangeInTimezone(
-                      meetup.startsAt,
-                      meetup.endsAt,
-                      timeZone
-                    )}
+                    {formatMeetupDate(meetup.eventDate)}
                   </p>
                 </div>
 
@@ -146,9 +140,6 @@ export function SelectedMeetupPanel({
                     RSVP / event link
                     <ArrowUpRight className="size-4" />
                   </a>
-                  <p className="text-[10px] text-[#f0f7e6]/45">
-                    Times shown in {timeZone.replaceAll("_", " ")}.
-                  </p>
                 </div>
               </div>
             </div>

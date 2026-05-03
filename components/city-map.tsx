@@ -123,10 +123,9 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
           .includes(query)
       })
       .sort((a, b) => {
-        const t =
-          new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
-        if (t !== 0) {
-          return t
+        const dateOrder = a.eventDate.localeCompare(b.eventDate)
+        if (dateOrder !== 0) {
+          return dateOrder
         }
         return a.title.localeCompare(b.title)
       })
@@ -413,7 +412,6 @@ export function CityMap({ companies: allCompanies, config }: CityMapProps) {
           ) : (
             <SelectedMeetupPanel
               meetup={selectedMeetup}
-              timeZone={config.timezone}
               meetupsLoading={meetupsLoading}
               meetupsError={meetupsError}
               collapsed={isSelectedPanelCollapsed}

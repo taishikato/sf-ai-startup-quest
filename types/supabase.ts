@@ -146,7 +146,7 @@ export type Database = {
           contact_email: string | null
           created_at: string
           description: string
-          ends_at: string | null
+          event_date: string
           event_url: string
           id: number
           latitude: number
@@ -155,7 +155,6 @@ export type Database = {
           organizer_name: string | null
           payload_hash: string | null
           slug: string
-          starts_at: string
           status: string
           title: string
           updated_at: string
@@ -166,7 +165,7 @@ export type Database = {
           contact_email?: string | null
           created_at?: string
           description: string
-          ends_at?: string | null
+          event_date: string
           event_url: string
           id?: never
           latitude: number
@@ -175,7 +174,6 @@ export type Database = {
           organizer_name?: string | null
           payload_hash?: string | null
           slug: string
-          starts_at: string
           status?: string
           title: string
           updated_at?: string
@@ -186,7 +184,7 @@ export type Database = {
           contact_email?: string | null
           created_at?: string
           description?: string
-          ends_at?: string | null
+          event_date?: string
           event_url?: string
           id?: never
           latitude?: number
@@ -195,7 +193,6 @@ export type Database = {
           organizer_name?: string | null
           payload_hash?: string | null
           slug?: string
-          starts_at?: string
           status?: string
           title?: string
           updated_at?: string
@@ -209,14 +206,13 @@ export type Database = {
         Row: {
           city: string | null
           description: string | null
-          ends_at: string | null
+          event_date: string | null
           event_url: string | null
           latitude: number | null
           location_label: string | null
           longitude: number | null
           organizer_name: string | null
           slug: string | null
-          starts_at: string | null
           status: string | null
           title: string | null
           venue_name: string | null
@@ -224,14 +220,13 @@ export type Database = {
         Insert: {
           city?: string | null
           description?: string | null
-          ends_at?: string | null
+          event_date?: string | null
           event_url?: string | null
           latitude?: number | null
           location_label?: string | null
           longitude?: number | null
           organizer_name?: string | null
           slug?: string | null
-          starts_at?: string | null
           status?: string | null
           title?: string | null
           venue_name?: string | null
@@ -239,14 +234,13 @@ export type Database = {
         Update: {
           city?: string | null
           description?: string | null
-          ends_at?: string | null
+          event_date?: string | null
           event_url?: string | null
           latitude?: number | null
           location_label?: string | null
           longitude?: number | null
           organizer_name?: string | null
           slug?: string | null
-          starts_at?: string | null
           status?: string | null
           title?: string | null
           venue_name?: string | null

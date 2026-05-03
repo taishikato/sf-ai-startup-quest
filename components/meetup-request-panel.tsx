@@ -4,8 +4,7 @@ import { useRef, useState, useTransition, type FormEvent } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { LoaderCircle, Plus, X } from "lucide-react"
 
-import { CITY_TIMEZONES, type CityId } from "@/lib/city-config"
-import { meetupLocalInputToUtcIso } from "@/lib/meetup-datetime"
+import type { CityId } from "@/lib/city-config"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -116,15 +115,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
       return
     }
 
-    let startsAtUtc: string
     const submittedCity = city
-    const tz = CITY_TIMEZONES[city]
-    try {
-      startsAtUtc = meetupLocalInputToUtcIso(`${dateLocal}T12:00`, tz)
-    } catch {
-      setErrorMessage("Date is invalid.")
-      return
-    }
 
     setStatus("submitting")
     setErrorMessage(null)
@@ -137,8 +128,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
         description: trimmedDescription,
         venueName: trimmedAddress.slice(0, 200),
         locationLabel: trimmedAddress,
-        startsAt: startsAtUtc,
-        endsAt: null,
+        eventDate: dateLocal,
         organizerName: trimmedXAccount,
         eventUrl: trimmedUrl,
         xAccount: trimmedXAccount,

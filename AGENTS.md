@@ -43,6 +43,7 @@
 - Meetup data is loaded from the Supabase `published_upcoming_meetups` view.
 - Meetup submissions use the `submitMeetup` server action and are published immediately.
 - The meetup submission form should stay short: city, title, optional description, date only, address, link, and optional X account.
+- Meetup dates are stored as `event_date` (`date`) because the product does not collect meetup times.
 - Meetup `organizer_name` can be `null`; do not backfill a placeholder such as `Community`.
 - Shared company types and helpers live in `lib/company.ts`.
 - Shared meetup types and helpers live in `lib/meetup.ts`.

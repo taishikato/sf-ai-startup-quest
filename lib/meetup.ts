@@ -1,5 +1,5 @@
 import type { Database } from "@/types/supabase"
-import type { CityId } from "@/lib/city-config"
+import { CITY_TIMEZONES, type CityId } from "@/lib/city-config"
 
 export type MeetupStatus = "published" | "cancelled" | "hidden"
 
@@ -13,8 +13,7 @@ export type Meetup = {
   venueName: string
   locationLabel: string
   coordinates: [number, number]
-  startsAt: string
-  endsAt: string | null
+  eventDate: string
   organizerName: string | null
   eventUrl: string
   contactEmail: string | null
@@ -31,8 +30,7 @@ type MeetupRow = Pick<
   | "location_label"
   | "latitude"
   | "longitude"
-  | "starts_at"
-  | "ends_at"
+  | "event_date"
   | "organizer_name"
   | "event_url"
   | "contact_email"
@@ -41,6 +39,19 @@ type MeetupRow = Pick<
 
 type PublicMeetupRow =
   Database["public"]["Views"]["published_upcoming_meetups"]["Row"]
+
+function localDateKey(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date)
+  const valueFor = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? ""
+
+  return `${valueFor("year")}-${valueFor("month")}-${valueFor("day")}`
+}
 
 export function meetupFromRow(row: MeetupRow): Meetup {
   return {
@@ -51,8 +62,7 @@ export function meetupFromRow(row: MeetupRow): Meetup {
     venueName: row.venue_name,
     locationLabel: row.location_label,
     coordinates: [row.longitude, row.latitude],
-    startsAt: row.starts_at,
-    endsAt: row.ends_at,
+    eventDate: row.event_date,
     organizerName: row.organizer_name,
     eventUrl: row.event_url,
     contactEmail: row.contact_email,
@@ -69,8 +79,7 @@ export function meetupFromPublicRow(row: PublicMeetupRow): Meetup {
     venueName: row.venue_name as string,
     locationLabel: row.location_label as string,
     coordinates: [row.longitude as number, row.latitude as number],
-    startsAt: row.starts_at as string,
-    endsAt: row.ends_at,
+    eventDate: row.event_date as string,
     organizerName: row.organizer_name,
     eventUrl: row.event_url as string,
     contactEmail: null,
@@ -78,7 +87,6 @@ export function meetupFromPublicRow(row: PublicMeetupRow): Meetup {
   }
 }
 
-/** Matches the "upcoming" rule from MEETUP_MODE_PLAN (client-side filter on fetched rows). */
 export function isMeetupUpcoming(
   meetup: Meetup,
   nowMs: number = Date.now()
@@ -87,21 +95,19 @@ export function isMeetupUpcoming(
     return false
   }
 
-  if (meetup.endsAt) {
-    return new Date(meetup.endsAt).getTime() >= nowMs
-  }
-
-  const graceMs = 2 * 60 * 60 * 1000
-  return new Date(meetup.startsAt).getTime() >= nowMs - graceMs
+  return (
+    meetup.eventDate >=
+    localDateKey(new Date(nowMs), CITY_TIMEZONES[meetup.city])
+  )
 }
 
 export function filterAndSortUpcomingMeetups(meetups: Meetup[]): Meetup[] {
   return [...meetups]
     .filter((m) => isMeetupUpcoming(m))
     .sort((a, b) => {
-      const t = new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
-      if (t !== 0) {
-        return t
+      const dateOrder = a.eventDate.localeCompare(b.eventDate)
+      if (dateOrder !== 0) {
+        return dateOrder
       }
       return a.title.localeCompare(b.title)
     })
