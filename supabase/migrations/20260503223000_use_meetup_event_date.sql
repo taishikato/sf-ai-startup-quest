@@ -1,9 +1,19 @@
 drop view if exists public.published_upcoming_meetups;
 
-truncate table public.meetups;
-
 alter table public.meetups
   add column if not exists event_date date;
+
+update public.meetups
+set event_date = case city
+  when 'sf' then (starts_at at time zone 'America/Los_Angeles')::date
+  when 'toronto' then (starts_at at time zone 'America/Toronto')::date
+  when 'ny' then (starts_at at time zone 'America/New_York')::date
+  when 'london' then (starts_at at time zone 'Europe/London')::date
+  when 'vancouver' then (starts_at at time zone 'America/Vancouver')::date
+  when 'tokyo' then (starts_at at time zone 'Asia/Tokyo')::date
+  else starts_at::date
+end
+where event_date is null;
 
 alter table public.meetups
   alter column event_date set not null;
