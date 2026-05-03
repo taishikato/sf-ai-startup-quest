@@ -5,6 +5,7 @@ import { LoaderCircle, Plus, X } from "lucide-react"
 
 import type { CityId } from "@/lib/city-config"
 import { COMPANY_CATEGORIES, type CompanyCategory } from "@/lib/company"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { submitCompanyRequest } from "@/app/actions/company-request"
 
@@ -21,6 +22,13 @@ const CITY_OPTIONS = [
   { value: "vancouver", label: "Vancouver" },
   { value: "tokyo", label: "Tokyo" },
 ] as const
+const FIELD_BASE_CLASS =
+  "w-full border border-[#d5d9df] bg-white text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+const INPUT_CLASS = cn(FIELD_BASE_CLASS, "h-11 px-3")
+const TEXTAREA_CLASS = cn(FIELD_BASE_CLASS, "resize-none px-3 py-3 leading-6")
+const FIELD_LABEL_CLASS = cn(
+  "mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase"
+)
 
 export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -138,7 +146,7 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
               setStatus("idle")
             }
           }}
-          className="h-11 border border-[#d5d9df] bg-white px-4 text-[12px] font-semibold tracking-[0.08em] text-[#111827] uppercase shadow-[0_10px_30px_rgba(15,23,42,0.12)] hover:bg-[#f8fafc]"
+          className="h-11 border-2 border-[#111827] bg-white px-4 text-[12px] font-semibold tracking-[0.08em] text-[#111827] uppercase shadow-[3px_3px_0_#111827] hover:bg-[#f8fafc]"
         >
           <Plus className="size-4" />
           Add company
@@ -146,31 +154,33 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
       </div>
 
       {isOpen ? (
-        <div className="absolute inset-0 z-30 flex justify-end bg-[rgba(15,23,42,0.16)]">
-          <div className="flex h-full w-full max-w-[420px] flex-col border-l border-[#d5d9df] bg-white shadow-[-12px_0_40px_rgba(15,23,42,0.16)]">
-            <div className="flex items-start justify-between gap-4 border-b border-[#e5e7eb] px-5 py-4">
-              <div>
-                <p className="text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                  Add company request
-                </p>
-                <h2 className="mt-1 text-[20px] font-semibold text-[#111827]">
-                  Suggest a company
-                </h2>
-                <p className="mt-2 max-w-[28ch] text-sm leading-6 text-[#4b5563]">
-                  Send a company for review. Approved submissions can be added
-                  to the map later.
-                </p>
+        <div className="absolute inset-0 z-30 flex justify-end bg-[rgba(17,24,39,0.18)]">
+          <div className="flex h-full w-full max-w-[420px] flex-col border-l-2 border-[#111827] bg-white text-[#111827] shadow-[-6px_0_0_rgba(17,24,39,0.16)]">
+            <div className="border-b border-[#d5d9df] bg-[#f8fafc] px-5 py-4">
+              <div className="flex items-start justify-between gap-4 border border-[#d5d9df] bg-white px-4 py-3">
+                <div>
+                  <p className="text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
+                    Add company request
+                  </p>
+                  <h2 className="mt-2 text-[22px] leading-[1.15] font-semibold tracking-tight text-[#111827]">
+                    Suggest a company
+                  </h2>
+                  <p className="mt-3 max-w-[30ch] text-sm leading-6 text-[#4b5563]">
+                    Send a company for review. Approved submissions can be added
+                    to the map later.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClose}
+                  className="mt-0.5 border border-[#d5d9df] bg-white text-[#4b5563] hover:border-[#111827] hover:bg-[#f8fafc] hover:text-[#111827]"
+                  aria-label="Close request panel"
+                >
+                  <X className="size-4" />
+                </Button>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={handleClose}
-                className="mt-0.5 border border-[#e5e7eb] bg-white text-[#4b5563] hover:bg-[#f9fafb]"
-                aria-label="Close request panel"
-              >
-                <X className="size-4" />
-              </Button>
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
@@ -197,15 +207,13 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
               ) : (
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      City
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>City</span>
                     <select
                       value={city}
                       onChange={(event) =>
                         setCity(event.target.value as CityId)
                       }
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                     >
                       {CITY_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -216,22 +224,20 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Company name
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Company name</span>
                     <input
                       type="text"
                       value={companyName}
                       onChange={(event) => setCompanyName(event.target.value)}
                       required
                       maxLength={120}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="Example AI"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
+                    <span className={cn(FIELD_LABEL_CLASS)}>
                       Short description
                     </span>
                     <textarea
@@ -242,22 +248,20 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                       required
                       maxLength={280}
                       rows={4}
-                      className="w-full resize-none border border-[#d5d9df] bg-white px-3 py-3 text-sm leading-6 text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(TEXTAREA_CLASS)}
                       placeholder="What does this company do, and why does it belong on the map?"
                     />
                   </label>
 
                   <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_120px]">
                     <label className="block">
-                      <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                        Category
-                      </span>
+                      <span className={cn(FIELD_LABEL_CLASS)}>Category</span>
                       <select
                         value={category}
                         onChange={(event) =>
                           setCategory(event.target.value as CompanyCategory)
                         }
-                        className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none focus:border-[#111827]"
+                        className={cn(INPUT_CLASS)}
                       >
                         {COMPANY_CATEGORIES.map((option) => (
                           <option key={option} value={option}>
@@ -268,9 +272,7 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                     </label>
 
                     <label className="block">
-                      <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                        Founded
-                      </span>
+                      <span className={cn(FIELD_LABEL_CLASS)}>Founded</span>
                       <input
                         type="number"
                         inputMode="numeric"
@@ -279,66 +281,58 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                         required
                         min={1900}
                         max={2100}
-                        className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                        className={cn(INPUT_CLASS)}
                         placeholder="2024"
                       />
                     </label>
                   </div>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Address
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Address</span>
                     <input
                       type="text"
                       value={locationLabel}
                       onChange={(event) => setLocationLabel(event.target.value)}
                       required
                       maxLength={200}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="1455 3rd St, San Francisco"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Website
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Website</span>
                     <input
                       type="url"
                       value={website}
                       onChange={(event) => setWebsite(event.target.value)}
                       maxLength={255}
                       pattern={WEBSITE_PATTERN}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="https://example.com"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Contact email
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Contact email</span>
                     <input
                       type="email"
                       value={contactEmail}
                       onChange={(event) => setContactEmail(event.target.value)}
                       maxLength={255}
-                      className="h-11 w-full border border-[#d5d9df] bg-white px-3 text-sm text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(INPUT_CLASS)}
                       placeholder="Optional"
                     />
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[11px] font-semibold tracking-[0.12em] text-[#6b7280] uppercase">
-                      Notes
-                    </span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>Notes</span>
                     <textarea
                       value={notes}
                       onChange={(event) => setNotes(event.target.value)}
                       maxLength={1000}
                       rows={6}
-                      className="w-full resize-none border border-[#d5d9df] bg-white px-3 py-3 text-sm leading-6 text-[#111827] transition-colors outline-none placeholder:text-[#9ca3af] focus:border-[#111827]"
+                      className={cn(TEXTAREA_CLASS)}
                       placeholder="Why should this company be added?"
                     />
                   </label>
@@ -356,7 +350,7 @@ export function CompanyRequestPanel({ initialCity }: CompanyRequestPanelProps) {
                     <Button
                       type="submit"
                       disabled={status === "submitting" || isPending}
-                      className="h-11 min-w-[148px] border border-[#111827] bg-[#111827] px-4 text-[12px] font-semibold tracking-[0.08em] text-white uppercase hover:bg-[#1f2937]"
+                      className="h-11 min-w-[148px] border-2 border-[#111827] bg-white px-4 text-[12px] font-semibold tracking-[0.08em] text-[#111827] uppercase shadow-[3px_3px_0_#111827] hover:bg-[#f8fafc]"
                     >
                       {status === "submitting" || isPending ? (
                         <>
