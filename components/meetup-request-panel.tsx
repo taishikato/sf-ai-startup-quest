@@ -262,7 +262,9 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
                   </label>
 
                   <label className="block">
-                    <span className={cn(FIELD_LABEL_CLASS)}>Description</span>
+                    <span className={cn(FIELD_LABEL_CLASS)}>
+                      Description (optional)
+                    </span>
                     <textarea
                       value={description}
                       onChange={(event) => setDescription(event.target.value)}
