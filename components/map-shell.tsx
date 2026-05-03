@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type MutableRefObject } from "react"
 import { Github, Volume2, VolumeX } from "lucide-react"
 import maplibregl, {
   type ExpressionSpecification,
@@ -47,6 +47,19 @@ const MAP_STYLE = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 // Oblique camera reads closer to isometric / retro city builders.
 const MAP_PITCH = 54
 const MAP_BEARING = -24
+
+function shouldSkipBoundsRefit(
+  skipFirstBoundsRefitRef: MutableRefObject<boolean>,
+  skipNextBoundsRefitRef: MutableRefObject<boolean>
+) {
+  const skip =
+    skipFirstBoundsRefitRef.current || skipNextBoundsRefitRef.current
+
+  skipFirstBoundsRefitRef.current = false
+  skipNextBoundsRefitRef.current = false
+
+  return skip
+}
 
 function setPaintPropertyIfLayerExists(
   map: MapLibreMap,
@@ -920,9 +933,12 @@ export function MapShell({
   const mapRef = useRef<MapLibreMap | null>(null)
   const markersRef = useRef<Map<string, Marker>>(new Map())
   const hasInteractedRef = useRef(false)
+  const hasRenderedMarkersRef = useRef(false)
   const mapMarkersSignatureRef = useRef("")
+  const prevModeRef = useRef(mode)
   const selectedSlugRef = useRef(selectedCompany.slug)
   const initialCenterRef = useRef(config.mapCenter)
+  const skipNextBoundsRefitRef = useRef(false)
   const skipFirstBoundsRefitRef = useRef(true)
   const [mapReady, setMapReady] = useState<MapLibreMap | null>(null)
   const denseStartups = companies.length >= 60
@@ -989,6 +1005,12 @@ export function MapShell({
       return
     }
 
+    const isModeSwitch =
+      hasRenderedMarkersRef.current && prevModeRef.current !== mode
+    if (isModeSwitch) {
+      skipNextBoundsRefitRef.current = true
+    }
+
     markersRef.current.forEach((marker) => marker.remove())
     markersRef.current.clear()
 
@@ -1018,15 +1040,19 @@ export function MapShell({
         .map((c) => c.slug)
         .sort()
         .join("|")
+      const modeMarkerSetSignature = `startups:${markerSetSignature}`
       const shouldRefit =
-        markerSetSignature !== mapMarkersSignatureRef.current &&
+        modeMarkerSetSignature !== mapMarkersSignatureRef.current &&
         companies.length > 0
-      mapMarkersSignatureRef.current = markerSetSignature
+      mapMarkersSignatureRef.current = modeMarkerSetSignature
 
       if (shouldRefit) {
-        if (skipFirstBoundsRefitRef.current) {
-          skipFirstBoundsRefitRef.current = false
-        } else {
+        if (
+          !shouldSkipBoundsRefit(
+            skipFirstBoundsRefitRef,
+            skipNextBoundsRefitRef
+          )
+        ) {
           const bounds = new maplibregl.LngLatBounds()
           companies.forEach((c) => bounds.extend(c.coordinates))
 
@@ -1074,15 +1100,19 @@ export function MapShell({
         .map((m) => m.slug)
         .sort()
         .join("|")
+      const modeMarkerSetSignature = `meetups:${markerSetSignature}`
       const shouldRefit =
-        markerSetSignature !== mapMarkersSignatureRef.current &&
+        modeMarkerSetSignature !== mapMarkersSignatureRef.current &&
         meetups.length > 0
-      mapMarkersSignatureRef.current = markerSetSignature
+      mapMarkersSignatureRef.current = modeMarkerSetSignature
 
       if (shouldRefit) {
-        if (skipFirstBoundsRefitRef.current) {
-          skipFirstBoundsRefitRef.current = false
-        } else {
+        if (
+          !shouldSkipBoundsRefit(
+            skipFirstBoundsRefitRef,
+            skipNextBoundsRefitRef
+          )
+        ) {
           const bounds = new maplibregl.LngLatBounds()
           meetups.forEach((m) => bounds.extend(m.coordinates))
 
@@ -1105,6 +1135,9 @@ export function MapShell({
         }
       }
     }
+
+    hasRenderedMarkersRef.current = true
+    prevModeRef.current = mode
   }, [
     companies,
     denseMeetups,
@@ -1175,7 +1208,7 @@ export function MapShell({
 
     map.flyTo({
       center: nextCenter,
-      zoom: 13.05,
+      zoom: map.getZoom(),
       pitch: MAP_PITCH,
       bearing: MAP_BEARING,
       speed: 0.65,
