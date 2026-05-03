@@ -128,10 +128,12 @@ export function SelectedMeetupPanel({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-start gap-2 text-sm text-[#f0f7e6]/78">
-                    <User className="mt-0.5 size-4 shrink-0 text-[#4ecdc4]" />
-                    <span>{meetup.organizerName}</span>
-                  </div>
+                  {meetup.organizerName ? (
+                    <div className="flex items-start gap-2 text-sm text-[#f0f7e6]/78">
+                      <User className="mt-0.5 size-4 shrink-0 text-[#4ecdc4]" />
+                      <span>{meetup.organizerName}</span>
+                    </div>
+                  ) : null}
                   <p className="text-sm leading-6 text-[#f0f7e6]/72">
                     {meetup.description}
                   </p>

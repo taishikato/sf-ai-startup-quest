@@ -126,7 +126,7 @@ export async function submitMeetup(
   const eventUrl = payload.eventUrl.trim()
   const xAccount = payload.xAccount.trim()
   const storedDescription = description || title
-  const storedOrganizerName = organizerName || xAccount || "Community"
+  const storedOrganizerName = organizerName || xAccount || null
 
   if (!VALID_CITIES.has(payload.city)) {
     return { status: "error", message: "City is invalid." }
@@ -166,11 +166,8 @@ export async function submitMeetup(
     return { status: "error", message: "X account is too long." }
   }
 
-  if (storedOrganizerName.length < 1 || storedOrganizerName.length > 120) {
-    return {
-      status: "error",
-      message: "Organizer name must be 1–120 characters.",
-    }
+  if (storedOrganizerName && storedOrganizerName.length > 120) {
+    return { status: "error", message: "X account is too long." }
   }
 
   let startsAtMs: number

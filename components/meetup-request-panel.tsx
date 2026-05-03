@@ -139,7 +139,7 @@ export function MeetupRequestPanel({ initialCity }: MeetupRequestPanelProps) {
         locationLabel: trimmedAddress,
         startsAt: startsAtUtc,
         endsAt: null,
-        organizerName: trimmedXAccount || "Community",
+        organizerName: trimmedXAccount,
         eventUrl: trimmedUrl,
         xAccount: trimmedXAccount,
       })

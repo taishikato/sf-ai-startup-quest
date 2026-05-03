@@ -119,69 +119,6 @@ export type Database = {
         }
         Relationships: []
       }
-      meetups: {
-        Row: {
-          city: string
-          contact_email: string | null
-          created_at: string
-          description: string
-          ends_at: string | null
-          event_url: string
-          id: number
-          latitude: number
-          location_label: string
-          longitude: number
-          organizer_name: string
-          payload_hash: string | null
-          slug: string
-          starts_at: string
-          status: string
-          title: string
-          updated_at: string
-          venue_name: string
-        }
-        Insert: {
-          city: string
-          contact_email?: string | null
-          created_at?: string
-          description: string
-          ends_at?: string | null
-          event_url: string
-          id?: never
-          latitude: number
-          location_label: string
-          longitude: number
-          organizer_name: string
-          payload_hash?: string | null
-          slug: string
-          starts_at: string
-          status?: string
-          title: string
-          updated_at?: string
-          venue_name: string
-        }
-        Update: {
-          city?: string
-          contact_email?: string | null
-          created_at?: string
-          description?: string
-          ends_at?: string | null
-          event_url?: string
-          id?: never
-          latitude?: number
-          location_label?: string
-          longitude?: number
-          organizer_name?: string
-          payload_hash?: string | null
-          slug?: string
-          starts_at?: string
-          status?: string
-          title?: string
-          updated_at?: string
-          venue_name?: string
-        }
-        Relationships: []
-      }
       meetup_submission_attempts: {
         Row: {
           created_at: string
@@ -203,6 +140,69 @@ export type Database = {
         }
         Relationships: []
       }
+      meetups: {
+        Row: {
+          city: string
+          contact_email: string | null
+          created_at: string
+          description: string
+          ends_at: string | null
+          event_url: string
+          id: number
+          latitude: number
+          location_label: string
+          longitude: number
+          organizer_name: string | null
+          payload_hash: string | null
+          slug: string
+          starts_at: string
+          status: string
+          title: string
+          updated_at: string
+          venue_name: string
+        }
+        Insert: {
+          city: string
+          contact_email?: string | null
+          created_at?: string
+          description: string
+          ends_at?: string | null
+          event_url: string
+          id?: never
+          latitude: number
+          location_label: string
+          longitude: number
+          organizer_name?: string | null
+          payload_hash?: string | null
+          slug: string
+          starts_at: string
+          status?: string
+          title: string
+          updated_at?: string
+          venue_name: string
+        }
+        Update: {
+          city?: string
+          contact_email?: string | null
+          created_at?: string
+          description?: string
+          ends_at?: string | null
+          event_url?: string
+          id?: never
+          latitude?: number
+          location_label?: string
+          longitude?: number
+          organizer_name?: string | null
+          payload_hash?: string | null
+          slug?: string
+          starts_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          venue_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       published_upcoming_meetups: {
@@ -220,6 +220,36 @@ export type Database = {
           status: string | null
           title: string | null
           venue_name: string | null
+        }
+        Insert: {
+          city?: string | null
+          description?: string | null
+          ends_at?: string | null
+          event_url?: string | null
+          latitude?: number | null
+          location_label?: string | null
+          longitude?: number | null
+          organizer_name?: string | null
+          slug?: string | null
+          starts_at?: string | null
+          status?: string | null
+          title?: string | null
+          venue_name?: string | null
+        }
+        Update: {
+          city?: string | null
+          description?: string | null
+          ends_at?: string | null
+          event_url?: string | null
+          latitude?: number | null
+          location_label?: string | null
+          longitude?: number | null
+          organizer_name?: string | null
+          slug?: string | null
+          starts_at?: string | null
+          status?: string | null
+          title?: string | null
+          venue_name?: string | null
         }
         Relationships: []
       }

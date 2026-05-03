@@ -27,7 +27,7 @@ export function hashMeetupPayload(parts: {
   locationLabel: string
   startsAt: string
   endsAt: string | null
-  organizerName: string
+  organizerName: string | null
   eventUrl: string
   xAccount: string
 }) {

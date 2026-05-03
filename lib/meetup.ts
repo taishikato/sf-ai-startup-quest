@@ -15,7 +15,7 @@ export type Meetup = {
   coordinates: [number, number]
   startsAt: string
   endsAt: string | null
-  organizerName: string
+  organizerName: string | null
   eventUrl: string
   contactEmail: string | null
   status: MeetupStatus
@@ -71,7 +71,7 @@ export function meetupFromPublicRow(row: PublicMeetupRow): Meetup {
     coordinates: [row.longitude as number, row.latitude as number],
     startsAt: row.starts_at as string,
     endsAt: row.ends_at,
-    organizerName: row.organizer_name as string,
+    organizerName: row.organizer_name,
     eventUrl: row.event_url as string,
     contactEmail: null,
     status: row.status as MeetupStatus,
