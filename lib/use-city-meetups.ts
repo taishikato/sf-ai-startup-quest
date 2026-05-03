@@ -7,7 +7,7 @@ import { filterAndSortUpcomingMeetups, meetupFromPublicRow } from "@/lib/meetup"
 import { createClient } from "@/lib/supabase/client"
 
 const PUBLIC_MEETUP_COLUMNS =
-  "slug, city, title, description, venue_name, location_label, latitude, longitude, starts_at, ends_at, organizer_name, event_url, status"
+  "slug, city, title, description, venue_name, location_label, latitude, longitude, event_date, organizer_name, event_url, status"
 
 export function useCityMeetups(city: CityId, enabled: boolean) {
   return useQuery({
@@ -19,7 +19,7 @@ export function useCityMeetups(city: CityId, enabled: boolean) {
         .from("published_upcoming_meetups")
         .select(PUBLIC_MEETUP_COLUMNS)
         .match({ city, status: "published" })
-        .order("starts_at", { ascending: true })
+        .order("event_date", { ascending: true })
         .order("title", { ascending: true })
 
       if (error) {

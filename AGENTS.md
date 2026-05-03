@@ -26,6 +26,9 @@
 - Do not add rounded corners unless explicitly requested.
 - Do not add decorative gradients, glassmorphism, or editorial styling unless explicitly requested.
 - Keep the layout flat, clean, and product-focused.
+- Use Tailwind CSS for styling.
+- When composing conditional `className` values in JavaScript or TypeScript, use the `cn` helper from `lib/utils.ts`.
+- In forms, label optional fields with `(optional)` next to the field name.
 
 ## Layout Rules
 
@@ -37,12 +40,19 @@
 ## Implementation Notes
 
 - Startup data is loaded from the Supabase `companies` table in `app/page.tsx`.
+- Meetup data is loaded from the Supabase `published_upcoming_meetups` view.
+- Meetup submissions use the `submitMeetup` server action and are published immediately.
+- The meetup submission form should stay short: city, title, optional description, date only, address, link, and optional X account.
+- Meetup dates are stored as `event_date` (`date`) because the product does not collect meetup times.
+- Meetup `organizer_name` can be `null`; do not backfill a placeholder such as `Community`.
 - Shared company types and helpers live in `lib/company.ts`.
+- Shared meetup types and helpers live in `lib/meetup.ts`.
 - Sidebar UI lives in `components/discovery-panel.tsx`.
 - Company cards live in `components/company-card.tsx`.
 - Map rendering lives in `components/map-shell.tsx`.
 - Company logos are shown in both cards and map markers. Keep those in sync.
 - In Supabase client queries, prefer `.match()` over `.eq()`.
+- After changing Supabase schema or views, run `nr genType` and commit the updated `types/supabase.ts`.
 
 ## Change Discipline
 

@@ -1,43 +1,12 @@
-import { formatInTimeZone, toDate } from "date-fns-tz"
+export function formatMeetupDate(eventDate: string) {
+  const [year, month, day] = eventDate.split("-").map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
 
-/** Interprets `datetime-local` style string as wall time in `timeZone`, returns UTC ISO. */
-export function meetupLocalInputToUtcIso(
-  dateTimeLocal: string,
-  timeZone: string
-): string {
-  const normalized =
-    dateTimeLocal.length === 16 ? `${dateTimeLocal}:00` : dateTimeLocal
-  const d = toDate(normalized, { timeZone })
-  if (Number.isNaN(d.getTime())) {
-    throw new Error("Invalid date/time")
-  }
-  return d.toISOString()
-}
-
-export function formatMeetupStartInTimezone(
-  startsAtIso: string,
-  timeZone: string
-) {
-  return formatInTimeZone(
-    new Date(startsAtIso),
-    timeZone,
-    "EEE, MMM d, yyyy · h:mm a"
-  )
-}
-
-export function formatMeetupRangeInTimezone(
-  startsAtIso: string,
-  endsAtIso: string | null,
-  timeZone: string
-) {
-  const start = formatMeetupStartInTimezone(startsAtIso, timeZone)
-  if (!endsAtIso) {
-    return start
-  }
-  const end = formatInTimeZone(
-    new Date(endsAtIso),
-    timeZone,
-    "h:mm a"
-  )
-  return `${start} – ${end}`
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date)
 }

@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers"
 
-import type { CityId } from "@/lib/city-config"
+import { CITY_TIMEZONES, type CityId } from "@/lib/city-config"
 import {
   buildMeetupGeocodeQuery,
   hashClientIp,
@@ -18,11 +18,10 @@ export type MeetupSubmitPayload = {
   description: string
   venueName: string
   locationLabel: string
-  startsAt: string
-  endsAt: string | null
+  eventDate: string
   organizerName: string
   eventUrl: string
-  contactEmail: string
+  xAccount: string
 }
 
 export type MeetupSubmitResult =
@@ -41,6 +40,33 @@ const VALID_CITIES = new Set<CityId>([
 const RATE_WINDOW_MS = 24 * 60 * 60 * 1000
 const RATE_MAX = 5
 const DUPLICATE_WINDOW_MS = 15 * 60 * 1000
+
+function localDateKey(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date)
+  const valueFor = (type: string) =>
+    parts.find((part) => part.type === type)?.value ?? ""
+
+  return `${valueFor("year")}-${valueFor("month")}-${valueFor("day")}`
+}
+
+function isValidDateOnly(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false
+  }
+
+  const [year, month, day] = value.split("-").map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  )
+}
 
 async function getRequestIp(): Promise<string> {
   const h = await headers()
@@ -124,7 +150,9 @@ export async function submitMeetup(
   const locationLabel = payload.locationLabel.trim()
   const organizerName = payload.organizerName.trim()
   const eventUrl = payload.eventUrl.trim()
-  const contactEmail = payload.contactEmail.trim()
+  const xAccount = payload.xAccount.trim()
+  const storedDescription = description || title
+  const storedOrganizerName = organizerName || xAccount || null
 
   if (!VALID_CITIES.has(payload.city)) {
     return { status: "error", message: "City is invalid." }
@@ -138,8 +166,11 @@ export async function submitMeetup(
     return { status: "error", message: "Title must be 1–200 characters." }
   }
 
-  if (description.length < 1 || description.length > 5000) {
-    return { status: "error", message: "Description must be 1–5000 characters." }
+  if (storedDescription.length < 1 || storedDescription.length > 5000) {
+    return {
+      status: "error",
+      message: "Description must be 1–5000 characters.",
+    }
   }
 
   if (venueName.length < 1 || venueName.length > 200) {
@@ -150,44 +181,27 @@ export async function submitMeetup(
     return { status: "error", message: "Address must be 1–300 characters." }
   }
 
-  if (organizerName.length < 1 || organizerName.length > 120) {
-    return { status: "error", message: "Organizer name must be 1–120 characters." }
-  }
-
   if (!eventUrl || !isValidHttpUrl(eventUrl) || eventUrl.length > 2000) {
-    return { status: "error", message: "Event link must be a valid http(s) URL." }
-  }
-
-  if (contactEmail.length > 255) {
-    return { status: "error", message: "Contact email is too long." }
-  }
-
-  let startsAtMs: number
-  let endsAtMs: number | null = null
-
-  try {
-    startsAtMs = new Date(payload.startsAt).getTime()
-    if (!Number.isFinite(startsAtMs)) {
-      return { status: "error", message: "Start time is invalid." }
+    return {
+      status: "error",
+      message: "Event link must be a valid http(s) URL.",
     }
-    if (payload.endsAt) {
-      endsAtMs = new Date(payload.endsAt).getTime()
-      if (!Number.isFinite(endsAtMs)) {
-        return { status: "error", message: "End time is invalid." }
-      }
-      if (endsAtMs <= startsAtMs) {
-        return { status: "error", message: "End time must be after start time." }
-      }
-    }
-  } catch {
-    return { status: "error", message: "Date and time are invalid." }
   }
 
-  const now = Date.now()
-  const upcoming =
-    endsAtMs !== null
-      ? endsAtMs >= now
-      : startsAtMs >= now - 2 * 60 * 60 * 1000
+  if (xAccount.length > 120) {
+    return { status: "error", message: "X account is too long." }
+  }
+
+  if (storedOrganizerName && storedOrganizerName.length > 120) {
+    return { status: "error", message: "X account is too long." }
+  }
+
+  if (!isValidDateOnly(payload.eventDate)) {
+    return { status: "error", message: "Date is invalid." }
+  }
+
+  const timeZone = CITY_TIMEZONES[payload.city]
+  const upcoming = payload.eventDate >= localDateKey(new Date(), timeZone)
 
   if (!upcoming) {
     return {
@@ -202,27 +216,31 @@ export async function submitMeetup(
 
   const turnstile = await verifyTurnstile(payload.turnstileToken, ip)
   if (!turnstile.ok) {
-    return { status: "error", message: turnstile.message ?? "Verification failed." }
+    return {
+      status: "error",
+      message: turnstile.message ?? "Verification failed.",
+    }
   }
 
   const payloadHash = hashMeetupPayload({
     city: payload.city,
     title,
-    description,
+    description: storedDescription,
     venueName,
     locationLabel,
-    startsAt: payload.startsAt,
-    endsAt: payload.endsAt,
-    organizerName,
+    eventDate: payload.eventDate,
+    organizerName: storedOrganizerName,
     eventUrl,
-    contactEmail,
+    xAccount,
   })
 
   const supabase = createAdminClient()
 
   // Same-payload cooldown: any prior attempt row (including failed geocode/insert)
   // blocks repeats within the window so we cannot hammer the geocoder.
-  const duplicateCutoff = new Date(Date.now() - DUPLICATE_WINDOW_MS).toISOString()
+  const duplicateCutoff = new Date(
+    Date.now() - DUPLICATE_WINDOW_MS
+  ).toISOString()
   const { data: duplicateAttempts, error: duplicateError } = await supabase
     .from("meetup_submission_attempts")
     .select("id")
@@ -252,7 +270,10 @@ export async function submitMeetup(
     .gte("created_at", rateCutoff)
 
   if (rateError) {
-    return { status: "error", message: "Could not verify rate limit. Try later." }
+    return {
+      status: "error",
+      message: "Could not verify rate limit. Try later.",
+    }
   }
 
   if ((rateCount ?? 0) >= RATE_MAX) {
@@ -267,7 +288,10 @@ export async function submitMeetup(
     .insert({ ip_hash: ipHash, payload_hash: payloadHash })
 
   if (attemptError) {
-    return { status: "error", message: "Could not record submission. Try again." }
+    return {
+      status: "error",
+      message: "Could not record submission. Try again.",
+    }
   }
 
   const query = buildMeetupGeocodeQuery(venueName, locationLabel, payload.city)
@@ -289,7 +313,7 @@ export async function submitMeetup(
     }
   }
 
-  const baseSlug = slugifyMeetupBase(title, payload.city, payload.startsAt)
+  const baseSlug = slugifyMeetupBase(title, payload.city, payload.eventDate)
   let slug = baseSlug
   let insertedSlug: string | null = null
 
@@ -300,16 +324,15 @@ export async function submitMeetup(
         slug,
         city: payload.city,
         title,
-        description,
+        description: storedDescription,
         venue_name: venueName,
         location_label: locationLabel,
         latitude: coords.lat,
         longitude: coords.lng,
-        starts_at: payload.startsAt,
-        ends_at: payload.endsAt || null,
-        organizer_name: organizerName,
+        event_date: payload.eventDate,
+        organizer_name: storedOrganizerName,
         event_url: eventUrl,
-        contact_email: contactEmail || null,
+        contact_email: xAccount || null,
         status: "published",
         payload_hash: payloadHash,
       })

@@ -3,12 +3,11 @@
 import { Calendar, MapPin } from "lucide-react"
 
 import type { Meetup } from "@/lib/meetup"
-import { formatMeetupStartInTimezone } from "@/lib/meetup-datetime"
+import { formatMeetupDate } from "@/lib/meetup-datetime"
 import { cn } from "@/lib/utils"
 
 type MeetupCardProps = {
   meetup: Meetup
-  timeZone: string
   active?: boolean
   compact?: boolean
   onSelect?: (slug: string) => void
@@ -16,12 +15,11 @@ type MeetupCardProps = {
 
 export function MeetupCard({
   meetup,
-  timeZone,
   active = false,
   compact = false,
   onSelect,
 }: MeetupCardProps) {
-  const when = formatMeetupStartInTimezone(meetup.startsAt, timeZone)
+  const when = formatMeetupDate(meetup.eventDate)
 
   const body = (
     <article
