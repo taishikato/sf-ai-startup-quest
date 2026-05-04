@@ -133,14 +133,37 @@ const WORLD_MAP_WIDTH = 1200
 const WORLD_MAP_HEIGHT = 600
 
 const CONTINENT_COLORS: Record<string, string> = {
-  "North America": "#7bd88f",
-  "South America": "#ffe66d",
-  Europe: "#a78bfa",
-  Africa: "#ff9f43",
-  Asia: "#f472b6",
-  Oceania: "#4ecdc4",
+  "North America": "#36d63f",
+  "South America": "#3bd34a",
+  Europe: "#49d94f",
+  Africa: "#43cf3d",
+  Asia: "#36d63f",
+  Oceania: "#56d957",
   Antarctica: "#f8faf7",
 }
+
+const TERRAIN_PATCHES = [
+  { x: 92, y: 126, width: 150, height: 52, rotate: -8 },
+  { x: 198, y: 186, width: 108, height: 42, rotate: 7 },
+  { x: 342, y: 242, width: 96, height: 44, rotate: -20 },
+  { x: 540, y: 92, width: 126, height: 44, rotate: 4 },
+  { x: 646, y: 198, width: 164, height: 56, rotate: -11 },
+  { x: 806, y: 154, width: 178, height: 62, rotate: 8 },
+  { x: 874, y: 308, width: 124, height: 48, rotate: -16 },
+  { x: 1008, y: 376, width: 112, height: 44, rotate: 12 },
+] as const
+
+const SAND_PATCHES = [
+  { x: 360, y: 300, width: 122, height: 54 },
+  { x: 556, y: 304, width: 214, height: 78 },
+  { x: 830, y: 248, width: 104, height: 46 },
+] as const
+
+const SWAMP_PATCHES = [
+  { x: 164, y: 300, width: 70, height: 34 },
+  { x: 514, y: 366, width: 78, height: 36 },
+  { x: 850, y: 286, width: 72, height: 36 },
+] as const
 
 export function WorldMapSelect() {
   const [activeCityId, setActiveCityId] = useState<CityId>("sf")
@@ -152,7 +175,7 @@ export function WorldMapSelect() {
   )
 
   return (
-    <main className="relative h-dvh overflow-hidden bg-[#5aa0d8] text-[#1a1a2e]">
+    <main className="relative h-dvh overflow-hidden bg-[#1439b8] text-[#1a1a2e]">
       <WorldMapCanvas
         cities={WORLD_STAGE_CITIES}
         activeCity={activeCity}
@@ -236,14 +259,17 @@ function WorldMapCanvas({
       worldData?.features.map((feature, index) => ({
         id: `${feature.properties.name ?? "country"}-${index}`,
         d: geometryToPath(feature.geometry),
-        fill: CONTINENT_COLORS[feature.properties.continent ?? ""] ?? "#d6c99a",
+        fill:
+          feature.properties.continent === "Antarctica"
+            ? CONTINENT_COLORS.Antarctica
+            : "url(#grass-dither)",
       })) ?? []
     )
   }, [worldData])
 
   return (
     <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-5">
-      <div className="relative h-full w-full overflow-hidden border-3 border-[#1a1a2e] bg-[#4b83c2] shadow-[6px_6px_0_#1a1a2e]">
+      <div className="relative h-full w-full overflow-hidden border-3 border-[#1a1a2e] bg-[#173bbb] shadow-[6px_6px_0_#1a1a2e]">
         <svg
           viewBox={`0 0 ${WORLD_MAP_WIDTH} ${WORLD_MAP_HEIGHT}`}
           role="img"
@@ -251,10 +277,67 @@ function WorldMapCanvas({
           className="h-full w-full"
           preserveAspectRatio="xMidYMid meet"
         >
+          <defs>
+            <pattern
+              id="ocean-lines"
+              width="16"
+              height="16"
+              patternUnits="userSpaceOnUse"
+            >
+              <path d="M0 15H16" stroke="#5fd1ff" strokeWidth="1" />
+              <path d="M0 7H16" stroke="#244ec4" strokeWidth="2" />
+            </pattern>
+            <pattern
+              id="grass-dither"
+              width="10"
+              height="10"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="10" height="10" fill="#36d63f" />
+              <rect x="0" y="0" width="4" height="2" fill="#82f06c" />
+              <rect x="6" y="6" width="4" height="2" fill="#238c24" />
+            </pattern>
+            <pattern
+              id="mountain-lines"
+              width="12"
+              height="12"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="12" height="12" fill="#50df45" />
+              <path d="M0 2H12M0 5H12M0 8H12" stroke="#1a1a2e" strokeWidth="1" />
+              <path d="M0 3H12M0 9H12" stroke="#f8faf7" strokeWidth="1" />
+            </pattern>
+            <pattern
+              id="sand-dither"
+              width="12"
+              height="12"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="12" height="12" fill="#ffe6a3" />
+              <rect x="2" y="2" width="3" height="3" fill="#f2c46d" />
+              <rect x="8" y="7" width="2" height="2" fill="#fff7c7" />
+            </pattern>
+            <pattern
+              id="swamp-dither"
+              width="12"
+              height="12"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="12" height="12" fill="#5630a8" />
+              <rect x="2" y="2" width="4" height="2" fill="#7d4fe0" />
+              <rect x="7" y="8" width="3" height="2" fill="#27135f" />
+            </pattern>
+          </defs>
           <rect
             width={WORLD_MAP_WIDTH}
             height={WORLD_MAP_HEIGHT}
-            fill="#4b83c2"
+            fill="#173bbb"
+          />
+          <rect
+            width={WORLD_MAP_WIDTH}
+            height={WORLD_MAP_HEIGHT}
+            fill="url(#ocean-lines)"
+            opacity="0.5"
           />
           <g opacity="0.2">
             {Array.from({ length: 11 }, (_, index) => (
@@ -264,8 +347,8 @@ function WorldMapCanvas({
                 x2={WORLD_MAP_WIDTH}
                 y1={index * 60}
                 y2={index * 60}
-                stroke="#f8faf7"
-                strokeWidth="2"
+                stroke="#72d5ff"
+                strokeWidth="1.5"
               />
             ))}
             {Array.from({ length: 13 }, (_, index) => (
@@ -275,24 +358,61 @@ function WorldMapCanvas({
                 x2={index * 100}
                 y1="0"
                 y2={WORLD_MAP_HEIGHT}
-                stroke="#1a1a2e"
-                strokeWidth="1.5"
+                stroke="#0d2372"
+                strokeWidth="1"
               />
             ))}
           </g>
-          <g stroke="#342414" strokeLinejoin="miter" strokeWidth="2.2">
+          <g stroke="#164018" strokeLinejoin="miter" strokeWidth="2.2">
             {countryPaths.map((country) => (
               <path key={country.id} d={country.d} fill={country.fill} />
             ))}
           </g>
-          <g opacity="0.18">
+          <g opacity="0.32">
             {countryPaths.map((country) => (
               <path
                 key={`${country.id}-shade`}
                 d={country.d}
                 fill="none"
-                stroke="#f8faf7"
-                strokeWidth="0.9"
+                stroke="#8af36f"
+                strokeWidth="1.1"
+              />
+            ))}
+          </g>
+          <g opacity="0.85" stroke="#164018" strokeWidth="1.6">
+            {TERRAIN_PATCHES.map((patch, index) => (
+              <ellipse
+                key={`terrain-${index}`}
+                cx={patch.x}
+                cy={patch.y}
+                rx={patch.width / 2}
+                ry={patch.height / 2}
+                fill="url(#mountain-lines)"
+                transform={`rotate(${patch.rotate} ${patch.x} ${patch.y})`}
+              />
+            ))}
+          </g>
+          <g opacity="0.95" stroke="#a26a28" strokeWidth="1.4">
+            {SAND_PATCHES.map((patch, index) => (
+              <ellipse
+                key={`sand-${index}`}
+                cx={patch.x}
+                cy={patch.y}
+                rx={patch.width / 2}
+                ry={patch.height / 2}
+                fill="url(#sand-dither)"
+              />
+            ))}
+          </g>
+          <g opacity="0.9" stroke="#1a1a2e" strokeWidth="1.2">
+            {SWAMP_PATCHES.map((patch, index) => (
+              <ellipse
+                key={`swamp-${index}`}
+                cx={patch.x}
+                cy={patch.y}
+                rx={patch.width / 2}
+                ry={patch.height / 2}
+                fill="url(#swamp-dither)"
               />
             ))}
           </g>
