@@ -6,6 +6,7 @@ import maplibregl, {
   type ExpressionSpecification,
   type Map as MapLibreMap,
   type Marker,
+  type StyleSpecification,
 } from "maplibre-gl"
 
 import type { CityMapConfig } from "@/lib/city-config"
@@ -43,10 +44,26 @@ function cityHrefWithMode(baseHref: string, mapMode: DiscoveryMode) {
   return baseHref
 }
 
-const MAP_STYLE = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+const MAP_STYLE_URL =
+  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 // Oblique camera reads closer to isometric / retro city builders.
 const MAP_PITCH = 54
 const MAP_BEARING = -24
+
+async function loadMapStyle(signal: AbortSignal): Promise<StyleSpecification> {
+  const response = await fetch(MAP_STYLE_URL, { signal })
+
+  if (!response.ok) {
+    throw new Error(`Failed to load map style: ${response.status}`)
+  }
+
+  const style = (await response.json()) as StyleSpecification
+
+  return {
+    ...style,
+    projection: style.projection ?? { type: "mercator" },
+  }
+}
 
 function shouldSkipBoundsRefit(
   skipFirstBoundsRefitRef: MutableRefObject<boolean>,
@@ -957,50 +974,70 @@ export function MapShell({
     }
 
     const markers = markersRef.current
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: MAP_STYLE,
-      center: initialCenterRef.current,
-      zoom: 11.95,
-      pitch: MAP_PITCH,
-      bearing: MAP_BEARING,
-      minZoom: 9.5,
-      maxZoom: 15.8,
-      attributionControl: false,
-      renderWorldCopies: false,
-    })
+    const controller = new AbortController()
+    let disposed = false
+    let resizeObserver: ResizeObserver | null = null
 
-    map.dragRotate.disable()
-    map.touchZoomRotate.disableRotation()
-    map.addControl(
-      new maplibregl.NavigationControl({ showCompass: false }),
-      "bottom-right"
-    )
-    map.on("load", () => {
-      applyMinecraftStyle(map)
-      addVoxelCityLayers(map)
-      map.resize()
-      setMapReady(map)
-    })
-    mapRef.current = map
+    loadMapStyle(controller.signal)
+      .then((style) => {
+        if (disposed || !containerRef.current || mapRef.current) {
+          return
+        }
 
-    const resizeObserver = new ResizeObserver(() => {
-      map.resize()
-    })
+        const map = new maplibregl.Map({
+          container: containerRef.current,
+          style,
+          center: initialCenterRef.current,
+          zoom: 11.95,
+          pitch: MAP_PITCH,
+          bearing: MAP_BEARING,
+          minZoom: 9.5,
+          maxZoom: 15.8,
+          attributionControl: false,
+          renderWorldCopies: false,
+        })
 
-    resizeObserver.observe(containerRef.current)
+        map.dragRotate.disable()
+        map.touchZoomRotate.disableRotation()
+        map.addControl(
+          new maplibregl.NavigationControl({ showCompass: false }),
+          "bottom-right"
+        )
+        map.on("load", () => {
+          applyMinecraftStyle(map)
+          addVoxelCityLayers(map)
+          map.resize()
+          setMapReady(map)
+        })
+        mapRef.current = map
+
+        resizeObserver = new ResizeObserver(() => {
+          map.resize()
+        })
+
+        resizeObserver.observe(containerRef.current)
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return
+        }
+
+        console.error(error)
+      })
 
     return () => {
-      resizeObserver.disconnect()
+      disposed = true
+      controller.abort()
+      resizeObserver?.disconnect()
       markers.forEach((marker) => marker.remove())
       markers.clear()
-      map.remove()
+      mapRef.current?.remove()
       mapRef.current = null
     }
   }, [])
 
   useEffect(() => {
-    const map = mapRef.current
+    const map = mapReady
     if (!map) {
       return
     }
@@ -1142,6 +1179,7 @@ export function MapShell({
     companies,
     denseMeetups,
     denseStartups,
+    mapReady,
     meetups,
     mode,
     onSelectCompany,
