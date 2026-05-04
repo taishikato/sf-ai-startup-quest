@@ -142,17 +142,6 @@ const CONTINENT_COLORS: Record<string, string> = {
   Antarctica: "#f8faf7",
 }
 
-const TERRAIN_PATCHES = [
-  { x: 92, y: 126, width: 150, height: 52, rotate: -8 },
-  { x: 198, y: 186, width: 108, height: 42, rotate: 7 },
-  { x: 342, y: 242, width: 96, height: 44, rotate: -20 },
-  { x: 540, y: 92, width: 126, height: 44, rotate: 4 },
-  { x: 646, y: 198, width: 164, height: 56, rotate: -11 },
-  { x: 806, y: 154, width: 178, height: 62, rotate: 8 },
-  { x: 874, y: 308, width: 124, height: 48, rotate: -16 },
-  { x: 1008, y: 376, width: 112, height: 44, rotate: 12 },
-] as const
-
 export function WorldMapSelect() {
   const [activeCityId, setActiveCityId] = useState<CityId>("sf")
   const activeCity = useMemo(
@@ -285,16 +274,6 @@ function WorldMapCanvas({
               <rect x="0" y="0" width="4" height="2" fill="#82f06c" />
               <rect x="6" y="6" width="4" height="2" fill="#238c24" />
             </pattern>
-            <pattern
-              id="mountain-lines"
-              width="12"
-              height="12"
-              patternUnits="userSpaceOnUse"
-            >
-              <rect width="12" height="12" fill="#50df45" />
-              <path d="M0 2H12M0 5H12M0 8H12" stroke="#1a1a2e" strokeWidth="1" />
-              <path d="M0 3H12M0 9H12" stroke="#f8faf7" strokeWidth="1" />
-            </pattern>
           </defs>
           <rect
             width={WORLD_MAP_WIDTH}
@@ -344,19 +323,6 @@ function WorldMapCanvas({
                 fill="none"
                 stroke="#8af36f"
                 strokeWidth="1.1"
-              />
-            ))}
-          </g>
-          <g opacity="0.85" stroke="#164018" strokeWidth="1.6">
-            {TERRAIN_PATCHES.map((patch, index) => (
-              <ellipse
-                key={`terrain-${index}`}
-                cx={patch.x}
-                cy={patch.y}
-                rx={patch.width / 2}
-                ry={patch.height / 2}
-                fill="url(#mountain-lines)"
-                transform={`rotate(${patch.rotate} ${patch.x} ${patch.y})`}
               />
             ))}
           </g>
