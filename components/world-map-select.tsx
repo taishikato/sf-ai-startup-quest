@@ -159,7 +159,7 @@ export function WorldMapSelect() {
         onActiveCityChange={setActiveCityId}
       />
 
-      <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex items-start justify-between gap-3 p-4 sm:p-6">
+      <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex items-start gap-3 p-4 sm:p-6">
         <Link
           href="/"
           className="pointer-events-auto flex min-w-0 items-center gap-3 border-2 border-[#1a1a2e] bg-white px-3 py-2 shadow-[4px_4px_0_#1a1a2e]"
@@ -177,9 +177,6 @@ export function WorldMapSelect() {
             AI Startup Quest
           </span>
         </Link>
-        <div className="border-2 border-[#1a1a2e] bg-[#ffe66d] px-3 py-2 font-(family-name:--font-pixel) text-[8px] text-[#1a1a2e] shadow-[3px_3px_0_#ff6b6b] sm:text-[9px]">
-          World Map
-        </div>
       </header>
 
       <div className="pointer-events-none absolute right-4 bottom-4 z-30 max-w-[min(360px,calc(100vw-32px))] border-2 border-[#1a1a2e] bg-white px-4 py-3 shadow-[4px_4px_0_#4ecdc4] sm:right-6 sm:bottom-6">
