@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -17,8 +17,8 @@ type WorldStageCity = {
   lat: number
   lon: number
   accent: string
-  markerX?: number
-  markerY?: number
+  signDx?: number
+  signDy?: number
 }
 
 type WorldFeatureCollection = {
@@ -41,6 +41,33 @@ type WorldFeature = {
 type Position = [number, number]
 type PolygonCoordinates = Position[][]
 type MultiPolygonCoordinates = Position[][][]
+type TerrainPatchType = "desert" | "forest" | "tundra" | "dry"
+
+type TerrainPatch = {
+  id: string
+  type: TerrainPatchType
+  lon: number
+  lat: number
+  rx: number
+  ry: number
+  rotate?: number
+}
+
+type MapEllipse = {
+  id: string
+  lon: number
+  lat: number
+  rx: number
+  ry: number
+  rotate?: number
+}
+
+type UrbanCluster = {
+  id: string
+  lon: number
+  lat: number
+  color?: string
+}
 
 const WORLD_STAGE_CITIES: WorldStageCity[] = [
   {
@@ -54,8 +81,8 @@ const WORLD_STAGE_CITIES: WorldStageCity[] = [
     lat: 37.7749,
     lon: -122.4194,
     accent: "#ff6b6b",
-    markerX: 20,
-    markerY: 54,
+    signDx: -24,
+    signDy: 12,
   },
   {
     id: "vancouver",
@@ -68,8 +95,8 @@ const WORLD_STAGE_CITIES: WorldStageCity[] = [
     lat: 49.2827,
     lon: -123.1207,
     accent: "#4ecdc4",
-    markerX: 10,
-    markerY: 33,
+    signDx: -8,
+    signDy: -10,
   },
   {
     id: "toronto",
@@ -82,8 +109,8 @@ const WORLD_STAGE_CITIES: WorldStageCity[] = [
     lat: 43.6532,
     lon: -79.3832,
     accent: "#ffe66d",
-    markerX: 28,
-    markerY: 36,
+    signDx: -15,
+    signDy: -4,
   },
   {
     id: "ny",
@@ -96,8 +123,8 @@ const WORLD_STAGE_CITIES: WorldStageCity[] = [
     lat: 40.7128,
     lon: -74.006,
     accent: "#7bd88f",
-    markerX: 36,
-    markerY: 56,
+    signDx: 18,
+    signDy: 4,
   },
   {
     id: "london",
@@ -110,8 +137,6 @@ const WORLD_STAGE_CITIES: WorldStageCity[] = [
     lat: 51.5074,
     lon: -0.1278,
     accent: "#a78bfa",
-    markerX: 50,
-    markerY: 35,
   },
   {
     id: "tokyo",
@@ -124,8 +149,6 @@ const WORLD_STAGE_CITIES: WorldStageCity[] = [
     lat: 35.6762,
     lon: 139.6503,
     accent: "#f472b6",
-    markerX: 88,
-    markerY: 55,
   },
 ]
 
@@ -141,6 +164,74 @@ const CONTINENT_COLORS: Record<string, string> = {
   Oceania: "#56d957",
   Antarctica: "#f8faf7",
 }
+
+const TERRAIN_PATCHES: TerrainPatch[] = [
+  { id: "sahara", type: "desert", lon: 15, lat: 22, rx: 96, ry: 34 },
+  { id: "arabia", type: "desert", lon: 45, lat: 23, rx: 45, ry: 24, rotate: -8 },
+  { id: "gobi", type: "dry", lon: 103, lat: 43, rx: 52, ry: 18, rotate: -8 },
+  { id: "australia-outback", type: "desert", lon: 134, lat: -25, rx: 64, ry: 30 },
+  { id: "us-southwest", type: "dry", lon: -111, lat: 35, rx: 32, ry: 18 },
+  { id: "amazon", type: "forest", lon: -62, lat: -6, rx: 62, ry: 38, rotate: -14 },
+  { id: "congo", type: "forest", lon: 22, lat: -2, rx: 42, ry: 28 },
+  { id: "boreal-canada", type: "tundra", lon: -104, lat: 58, rx: 82, ry: 17 },
+  { id: "siberia", type: "tundra", lon: 95, lat: 60, rx: 120, ry: 20 },
+  { id: "southeast-asia", type: "forest", lon: 104, lat: 14, rx: 36, ry: 20, rotate: 10 },
+]
+
+const LAKE_MARKERS: MapEllipse[] = [
+  { id: "great-lakes", lon: -84, lat: 45, rx: 22, ry: 8, rotate: -8 },
+  { id: "victoria", lon: 33, lat: -1, rx: 13, ry: 8 },
+  { id: "baikal", lon: 108, lat: 53, rx: 5, ry: 16, rotate: -25 },
+  { id: "caspian", lon: 51, lat: 41, rx: 11, ry: 21, rotate: -8 },
+]
+
+const MOUNTAIN_RANGES: { id: string; points: Position[] }[] = [
+  {
+    id: "rockies",
+    points: [
+      [-128, 54],
+      [-120, 47],
+      [-112, 40],
+      [-106, 32],
+    ],
+  },
+  {
+    id: "andes",
+    points: [
+      [-79, 10],
+      [-76, -6],
+      [-72, -18],
+      [-70, -32],
+      [-70, -46],
+    ],
+  },
+  {
+    id: "himalayas",
+    points: [
+      [68, 34],
+      [80, 31],
+      [92, 29],
+    ],
+  },
+  {
+    id: "alps",
+    points: [
+      [5, 46],
+      [11, 47],
+      [16, 46],
+    ],
+  },
+]
+
+const URBAN_CLUSTERS: UrbanCluster[] = [
+  { id: "western-us", lon: -122, lat: 37, color: "#ffd15c" },
+  { id: "eastern-us", lon: -74, lat: 41, color: "#ffd15c" },
+  { id: "western-europe", lon: 2, lat: 49, color: "#f8e27a" },
+  { id: "uk", lon: -1, lat: 52, color: "#f8e27a" },
+  { id: "japan", lon: 139, lat: 36, color: "#ffd15c" },
+  { id: "east-china", lon: 121, lat: 31, color: "#eecb5c" },
+  { id: "india", lon: 77, lat: 23, color: "#eecb5c" },
+]
 
 export function WorldMapSelect() {
   const [activeCityId, setActiveCityId] = useState<CityId>("sf")
@@ -261,6 +352,29 @@ function WorldMapCanvas({
               <rect x="8" y="15" width="5" height="2" fill="#2b66ee" />
             </pattern>
             <pattern
+              id="ocean-wave-bits"
+              width="72"
+              height="36"
+              patternUnits="userSpaceOnUse"
+            >
+              <g>
+                <rect x="4" y="8" width="7" height="3" fill="#4c82ff" />
+                <rect x="18" y="12" width="5" height="3" fill="#2f64e8" />
+                <rect x="37" y="6" width="8" height="3" fill="#6ca0ff" />
+                <rect x="57" y="15" width="6" height="3" fill="#1e49c7" />
+                <rect x="10" y="27" width="8" height="3" fill="#2b66ee" />
+                <rect x="31" y="24" width="5" height="3" fill="#7fb0ff" />
+                <rect x="51" y="29" width="9" height="3" fill="#2454d5" />
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  values="0 0; 18 0; 0 0"
+                  dur="7s"
+                  repeatCount="indefinite"
+                />
+              </g>
+            </pattern>
+            <pattern
               id="grass-dither"
               width="10"
               height="10"
@@ -270,6 +384,61 @@ function WorldMapCanvas({
               <rect x="0" y="0" width="4" height="2" fill="#82f06c" />
               <rect x="6" y="6" width="4" height="2" fill="#238c24" />
             </pattern>
+            <pattern
+              id="desert-dither"
+              width="12"
+              height="12"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="12" height="12" fill="#f0cf76" />
+              <rect x="2" y="2" width="3" height="3" fill="#ffd98a" />
+              <rect x="8" y="7" width="3" height="2" fill="#c99a3f" />
+            </pattern>
+            <pattern
+              id="forest-dither"
+              width="12"
+              height="12"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="12" height="12" fill="#1f9a32" />
+              <rect x="1" y="2" width="4" height="4" fill="#42c84a" />
+              <rect x="7" y="7" width="3" height="3" fill="#126820" />
+            </pattern>
+            <pattern
+              id="tundra-dither"
+              width="12"
+              height="12"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="12" height="12" fill="#a5db87" />
+              <rect x="1" y="2" width="4" height="2" fill="#d8f0c8" />
+              <rect x="8" y="8" width="3" height="2" fill="#7db76a" />
+            </pattern>
+            <pattern
+              id="dry-dither"
+              width="12"
+              height="12"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="12" height="12" fill="#c8b65a" />
+              <rect x="2" y="3" width="4" height="2" fill="#e1d06c" />
+              <rect x="8" y="8" width="3" height="2" fill="#8a7f36" />
+            </pattern>
+            <pattern
+              id="lake-bits"
+              width="8"
+              height="8"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="8" height="8" fill="#144bd3" />
+              <rect x="1" y="2" width="4" height="2" fill="#4b8dff" />
+              <rect x="5" y="6" width="2" height="1" fill="#0d318f" />
+            </pattern>
+            <clipPath id="land-clip">
+              {countryPaths.map((country) => (
+                <path key={`${country.id}-clip`} d={country.d} />
+              ))}
+            </clipPath>
           </defs>
           <rect
             width={WORLD_MAP_WIDTH}
@@ -282,10 +451,81 @@ function WorldMapCanvas({
             fill="url(#ocean-bits)"
             opacity="1"
           />
-          <g stroke="#164018" strokeLinejoin="miter" strokeWidth="2.2">
+          <rect
+            width={WORLD_MAP_WIDTH}
+            height={WORLD_MAP_HEIGHT}
+            fill="url(#ocean-wave-bits)"
+            opacity="0.46"
+          />
+          <g>
             {countryPaths.map((country) => (
               <path key={country.id} d={country.d} fill={country.fill} />
             ))}
+          </g>
+          <g clipPath="url(#land-clip)">
+            {TERRAIN_PATCHES.map((patch) => {
+              const position = projectLonLat(patch.lon, patch.lat)
+              return (
+                <ellipse
+                  key={patch.id}
+                  cx={position.x}
+                  cy={position.y}
+                  rx={patch.rx}
+                  ry={patch.ry}
+                  fill={`url(#${patch.type}-dither)`}
+                  opacity="0.78"
+                  transform={`rotate(${patch.rotate ?? 0} ${position.x} ${
+                    position.y
+                  })`}
+                />
+              )
+            })}
+            {MOUNTAIN_RANGES.map((range) => {
+              return (
+                <g key={range.id} opacity="0.88">
+                  {range.points.map(([lon, lat], index) => {
+                    const position = projectLonLat(lon, lat)
+                    return (
+                      <MountainGlyph
+                        key={`${range.id}-${index}`}
+                        x={position.x}
+                        y={position.y}
+                      />
+                    )
+                  })}
+                </g>
+              )
+            })}
+            {LAKE_MARKERS.map((lake) => {
+              const position = projectLonLat(lake.lon, lake.lat)
+              return (
+                <ellipse
+                  key={lake.id}
+                  cx={position.x}
+                  cy={position.y}
+                  rx={lake.rx}
+                  ry={lake.ry}
+                  fill="url(#lake-bits)"
+                  stroke="#164018"
+                  strokeWidth="2"
+                  opacity="0.92"
+                  transform={`rotate(${lake.rotate ?? 0} ${position.x} ${
+                    position.y
+                  })`}
+                />
+              )
+            })}
+            {URBAN_CLUSTERS.map((cluster) => {
+              const position = projectLonLat(cluster.lon, cluster.lat)
+              return (
+                <g key={cluster.id} transform={`translate(${position.x} ${position.y})`}>
+                  <rect x="-4" y="-4" width="3" height="3" fill="#3b2f1a" />
+                  <rect x="1" y="-5" width="3" height="3" fill={cluster.color} />
+                  <rect x="-1" y="0" width="3" height="3" fill="#f8f0a0" />
+                  <rect x="5" y="2" width="3" height="3" fill="#3b2f1a" />
+                </g>
+              )
+            })}
           </g>
           <g opacity="0.32">
             {countryPaths.map((country) => (
@@ -298,56 +538,118 @@ function WorldMapCanvas({
               />
             ))}
           </g>
-        </svg>
-        <div className="absolute inset-0">
+          <g
+            fill="none"
+            stroke="#164018"
+            strokeLinejoin="miter"
+            strokeWidth="2.2"
+          >
+            {countryPaths.map((country) => (
+              <path key={`${country.id}-border`} d={country.d} />
+            ))}
+          </g>
           {cities.map((city) => {
             const isActive = city.id === activeCity.id
-            const position = projectCity(city)
+            const position = projectLonLat(city.lon, city.lat)
             return (
-              <Link
+              <a
                 key={city.id}
                 href={city.href}
                 onMouseEnter={() => onActiveCityChange(city.id)}
                 onFocus={() => onActiveCityChange(city.id)}
-                className="absolute z-20 flex -translate-x-1/2 -translate-y-full flex-col items-center text-[#1a1a2e] no-underline transition-transform focus:outline-none focus-visible:ring-4 focus-visible:ring-[#4ecdc4]"
-                style={
-                  {
-                    left: `${city.markerX ?? position.x}%`,
-                    top: `${city.markerY ?? position.y}%`,
-                    transform: `translate(-50%, -100%) scale(${
-                      isActive ? 1.14 : 1
-                    })`,
-                  } as CSSProperties
-                }
                 aria-label={`Open ${city.name} AI Startup Map`}
+                className="focus:outline-none"
               >
-                <span
-                  className="grid h-6 min-w-8 place-items-center border-2 border-[#1a1a2e] px-2 font-(family-name:--font-pixel) text-[8px] leading-none shadow-[3px_3px_0_#1a1a2e] max-sm:h-5 max-sm:min-w-6 max-sm:px-1 max-sm:text-[6px]"
-                  style={{
-                    backgroundColor: isActive ? "#ffe66d" : "#fffefc",
-                    boxShadow: isActive
-                      ? `0 0 0 2px ${city.accent}, 4px 4px 0 #1a1a2e`
-                      : "3px 3px 0 #1a1a2e",
-                  }}
+                <g
+                  transform={`translate(${position.x.toFixed(1)} ${position.y.toFixed(1)}) scale(${
+                    isActive ? 1.14 : 1
+                  })`}
                 >
-                  {city.code}
-                </span>
-                <span
-                  className="-mt-px h-2.5 w-2 border-x-2 border-[#1a1a2e] max-sm:h-2 max-sm:w-1.5"
-                  style={{ backgroundColor: city.accent }}
-                />
-                <span
-                  className="h-1.5 w-4 border-2 border-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e] max-sm:h-1 max-sm:w-3"
-                  style={{
-                    backgroundColor: isActive ? "#ffe66d" : city.accent,
-                  }}
-                />
-              </Link>
+                  <WoodSignMarker
+                    code={city.code}
+                    signDx={city.signDx ?? 0}
+                    signDy={city.signDy ?? 0}
+                  />
+                </g>
+              </a>
             )
           })}
-        </div>
+        </svg>
       </div>
     </div>
+  )
+}
+
+function WoodSignMarker({
+  code,
+  signDx,
+  signDy,
+}: {
+  code: string
+  signDx: number
+  signDy: number
+}) {
+  const labelWidth = code.length > 2 ? 48 : 40
+
+  return (
+    <>
+      <line
+        x1="0"
+        y1="0"
+        x2={signDx}
+        y2={signDy + 2}
+        stroke="#1a1a2e"
+        strokeWidth="2"
+        opacity="0.7"
+      />
+      <image
+        href="/map-assets/city-sign-marker.png"
+        x={signDx - 31}
+        y={signDy - 47}
+        width="62"
+        height="62"
+        preserveAspectRatio="xMidYMid meet"
+      />
+      <rect
+        x={signDx - labelWidth / 2}
+        y={signDy - 25}
+        width={labelWidth}
+        height="14"
+        fill="rgba(60, 31, 18, 0.54)"
+        stroke="#1a1a2e"
+        strokeWidth="0.8"
+        opacity="0.64"
+      />
+      <text
+        x={signDx}
+        y={signDy - 15}
+        textAnchor="middle"
+        fill="#fff4ce"
+        fontSize="9.5"
+        stroke="#1a1a2e"
+        strokeWidth="0.5"
+        paintOrder="stroke"
+        style={{ fontFamily: "var(--font-pixel)" }}
+      >
+        {code}
+      </text>
+    </>
+  )
+}
+
+function MountainGlyph({ x, y }: { x: number; y: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <path
+        d="M 0 -8 L 9 7 H -9 Z"
+        fill="#7a5a35"
+        stroke="#164018"
+        strokeLinejoin="miter"
+        strokeWidth="1.8"
+      />
+      <path d="M 0 -6 L 4 2 H -2 Z" fill="#d8c7a2" opacity="0.9" />
+      <rect x="-3" y="5" width="6" height="2" fill="#4b3522" opacity="0.8" />
+    </g>
   )
 }
 
@@ -372,15 +674,6 @@ function polygonToPath(polygon: PolygonCoordinates) {
       return `${commands.join(" ")} Z`
     })
     .join(" ")
-}
-
-function projectCity(city: WorldStageCity) {
-  const { x, y } = projectLonLat(city.lon, city.lat)
-
-  return {
-    x: (x / WORLD_MAP_WIDTH) * 100,
-    y: (y / WORLD_MAP_HEIGHT) * 100,
-  }
 }
 
 function projectLonLat(lon: number, lat: number) {
