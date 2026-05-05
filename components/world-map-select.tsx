@@ -1,10 +1,12 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { Volume2, VolumeX } from "lucide-react"
 
 import type { CityId } from "@/lib/city-config"
+import { cn } from "@/lib/utils"
 import {
   WORLD_STAGE_CITIES,
   type WorldStageCity,
@@ -15,6 +17,8 @@ const WORLD_MAP_HEIGHT = 600
 
 export function WorldMapSelect() {
   const [activeCityId, setActiveCityId] = useState<CityId>("sf")
+  const [isSoundOn, setIsSoundOn] = useState(false)
+  const audioRef = useRef<HTMLAudioElement>(null)
   const activeCity = useMemo(
     () =>
       WORLD_STAGE_CITIES.find((city) => city.id === activeCityId) ??
@@ -22,8 +26,38 @@ export function WorldMapSelect() {
     [activeCityId]
   )
 
+  const toggleSound = async () => {
+    const audio = audioRef.current
+
+    if (!audio) {
+      return
+    }
+
+    if (isSoundOn) {
+      audio.pause()
+      setIsSoundOn(false)
+      return
+    }
+
+    try {
+      audio.volume = 0.45
+      await audio.play()
+      setIsSoundOn(true)
+    } catch {
+      setIsSoundOn(false)
+    }
+  }
+
   return (
     <main className="relative h-dvh overflow-hidden bg-[#1439b8] text-[#1a1a2e]">
+      <audio
+        ref={audioRef}
+        src="/audio/sf-ai-startup-map-theme.mp3"
+        loop
+        preload="none"
+        onPause={() => setIsSoundOn(false)}
+        onPlay={() => setIsSoundOn(true)}
+      />
       <WorldMapCanvas
         cities={WORLD_STAGE_CITIES}
         activeCity={activeCity}
@@ -31,23 +65,41 @@ export function WorldMapSelect() {
       />
 
       <header className="pointer-events-none absolute top-0 right-0 left-0 z-30 flex items-start gap-3 p-4 sm:p-6">
-        <Link
-          href="/"
-          className="pointer-events-auto flex min-w-0 items-center gap-3 border-2 border-[#1a1a2e] bg-white px-3 py-2 shadow-[4px_4px_0_#1a1a2e]"
-          aria-label="AI Startup Quest home"
-        >
-          <Image
-            src="/brand-mark.png"
-            alt=""
-            width={30}
-            height={30}
-            className="shrink-0"
-            priority
-          />
-          <span className="hidden truncate font-(family-name:--font-pixel) text-[11px] leading-5 text-[#1a1a2e] sm:block">
-            AI Startup Quest
-          </span>
-        </Link>
+        <div className="pointer-events-auto flex min-w-0 items-center gap-3 border-2 border-[#1a1a2e] bg-white px-3 py-2 shadow-[4px_4px_0_#1a1a2e]">
+          <Link
+            href="/"
+            className="flex min-w-0 items-center gap-3"
+            aria-label="AI Startup Quest home"
+          >
+            <Image
+              src="/brand-mark.png"
+              alt=""
+              width={30}
+              height={30}
+              className="shrink-0"
+              priority
+            />
+            <span className="hidden truncate font-(family-name:--font-pixel) text-[11px] leading-5 text-[#1a1a2e] sm:block">
+              AI Startup Quest
+            </span>
+          </Link>
+          <button
+            type="button"
+            onClick={toggleSound}
+            className={cn(
+              "flex size-8 shrink-0 items-center justify-center border-2 border-[#1a1a2e] bg-[#fff7dd] text-[#1a1a2e] shadow-[2px_2px_0_#1a1a2e] transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffe66d] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+              isSoundOn && "bg-[#ffe66d]"
+            )}
+            aria-label={isSoundOn ? "Pause theme music" : "Play theme music"}
+            aria-pressed={isSoundOn}
+          >
+            {isSoundOn ? (
+              <Volume2 className="size-5" aria-hidden="true" strokeWidth={2.4} />
+            ) : (
+              <VolumeX className="size-5" aria-hidden="true" strokeWidth={2.4} />
+            )}
+          </button>
+        </div>
       </header>
 
       <div className="pointer-events-none absolute right-4 bottom-4 z-30 max-w-[min(360px,calc(100vw-32px))] border-2 border-[#1a1a2e] bg-white px-4 py-3 shadow-[4px_4px_0_#4ecdc4] sm:right-6 sm:bottom-6">
